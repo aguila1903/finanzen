@@ -1,0 +1,144 @@
+.box_login {
+    color: #545F7C;
+    position: absolute;
+    top: 300px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;    
+    background-image: url("../../images/login/logo.png");
+    background-repeat: no-repeat;
+    background-position: top left;
+    font-family: 'Cambria', 'Times New Roman', '18thCentury';
+    font-size: 16px;
+    padding: 55px;
+    padding-top: 10px;
+    margin-top: 50px;
+    /*box-shadow: 10px 10px 10px grey;*/
+    border-radius: 10px;
+    opacity: 0.9;
+    border: solid 10px whitesmoke;
+}
+form {
+    position: relative;
+    color: #545F7C;
+    font-family: 'Cambria', 'Times New Roman', '18thCentury';
+    font-size: 16px;
+    padding-top: 40px;
+}
+.feld {
+    width: 242px;
+    height: 32px;
+    border: none; 
+    font-family: 'Cambria', 'Times New Roman', '18thCentury';
+    font-size: 16px;
+    border-radius: 0px;
+    /*box-shadow: 5px 5px 5px grey;*/
+    background-color: #F0F0F0;
+    color: #545F7C;
+
+}
+#antwort {
+    position: relative;
+    height: 30px;
+    border: none;
+    text-align: center;
+    width: 270px;
+}
+body {
+    /*background-color: #ddd;*/ 
+    /*background-image: url("../../images/welcome.png");*/
+    background-image: url("../../images/backgrounds/bg_money.jpeg");
+    background-repeat: no-repeat;  
+    background-position: top center;  
+    background-size: 100%;
+    margin: 0;
+    padding: 0;  
+}
+/* #bg_img { */
+    /*Verschwommen*/
+    /*    -webkit-filter: blur(4px);
+        -moz-filter: blur(4px);
+        -o-filter: blur(4px);
+        -ms-filter: blur(4px);
+        filter: blur(4px);*/
+
+/* } */
+.glyphi{
+    float: left;
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+    height: 32px;
+    width: 32px;
+    background-position: right;
+    margin-right: 2px;
+}
+.glyph_pw{
+    background-image: url("../../images/login/pw.png");
+}
+#glyph_usr{
+    background-image: url("../../images/login/user.png");
+}
+
+
+#title {
+    display: block;
+    width: 100%;
+    text-align: center;
+    height: 50px;
+    margin-top: 1px;
+    padding: 0;     
+    color: #545F7C;
+    font-size: 30px;
+    font-family: 'Cambria', 'Times New Roman', '18thCentury';
+}
+.center_login{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    /*width: 50%;*/  
+}
+.login_button {
+    -moz-box-shadow: inset 0px -3px 7px 0px #C0C0C0;
+    -webkit-box-shadow: inset 0px -3px 7px 0px #C0C0C0;
+    box-shadow: inset 0px -3px 7px 0px #C0C0C0;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #A0A0A0), color-stop(1, #C0C0C0));
+    background: -moz-linear-gradient(top, #A0A0A0 5%, #C0C0C0 100%);
+    background: -webkit-linear-gradient(top, #A0A0A0 5%, #C0C0C0 100%);
+    background: -o-linear-gradient(top, #A0A0A0 5%, #C0C0C0 100%);
+    background: -ms-linear-gradient(top, #A0A0A0 5%, #C0C0C0 100%);
+    background: linear-gradient(to bottom, #A0A0A0 5%, #C0C0C0 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@buttonBaseColor2', endColorstr='@buttonBaseColor1', GradientType=0);
+    background-color: #A0A0A0;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 5px;
+    /*border:1px solid #0b0e07;*/
+    border: none;
+    display: inline-block;
+    cursor: pointer;
+    color: #ffffff;
+    font-family: 'Cambria', 'Times New Roman', '18thCentury';
+    font-size: 18px;
+    padding: 8px 39px;
+    text-decoration: none;
+    text-shadow: 0px 1px 0px #263666;
+    width: 135px;
+}
+.login_button:hover {
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #C0C0C0), color-stop(1, #A0A0A0));
+    background: -moz-linear-gradient(top, #C0C0C0 5%, #A0A0A0 100%);
+    background: -webkit-linear-gradient(top, #C0C0C0 5%, #A0A0A0 100%);
+    background: -o-linear-gradient(top, #C0C0C0 5%, #A0A0A0 100%);
+    background: -ms-linear-gradient(top, #C0C0C0 5%, #A0A0A0 100%);
+    background: linear-gradient(to bottom, #C0C0C0 5%, #A0A0A0 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@buttonBaseColor1', endColorstr='@buttonBaseColor2', GradientType=0);
+    background-color: #C0C0C0;
+}
+.login_button:active {
+    position: relative;
+    top: 1px;
+}
+label {
+    display: block;
+}
+/*# sourceMappingURL=styles.css.map */
