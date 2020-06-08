@@ -379,7 +379,7 @@ isc.IButton.create({
 
 
 isc.HLayout.create({
-    ID: "HLayoutStmmKontenEdit",
+    ID: "HLayoutStammKontenEdit",
     height: 30,
     width: "100%",
     align: "center",
@@ -409,7 +409,7 @@ isc.Window.create({
     isModal: false,
     items: [dfStammKontenEdit, isc.LayoutSpacer.create({
             height: 20
-        }), HLayoutStmmKontenEdit]});
+        }), HLayoutStammKontenEdit]});
 
 isc.ToolStripButton.create({
     ID: "tsbStammKontenEdit",
