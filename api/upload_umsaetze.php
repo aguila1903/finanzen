@@ -35,7 +35,7 @@ if (isset($_FILES['file'])) {
     $error_array = $_FILES['file']['error'];
 
     if (preg_match("/csv/i", $type_array) != 1) {
-        print json_encode("Error: Datei ist keine PDF-Datei");
+        print json_encode("Error: Datei ist keine CSV-Datei");
         return;
     }
 
