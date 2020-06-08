@@ -10,7 +10,6 @@ $ADODB_COUNTRECS = true;
 $dbSyb = ADONewConnection('mysqli');
 $dbSyb->memCache = false;
 
-
 $dbSyb->Connect(DB_HOST, DB_USER, DB_PW, DB_NAME);  //=>>> Verbindungsaufbau mit der DB
 
 if (!$dbSyb->IsConnected()) {
