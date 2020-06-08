@@ -54,9 +54,7 @@ if (isset($_SESSION["finanzen"]["loggedin"]) && $_SESSION["finanzen"]["loggedin"
 
         </HEAD>
         <BODY>
-            <!-- <script src="functions.js" type="text/javascript"></script> -->    
-
-        
+            <!-- <script src="functions.js" type="text/javascript"></script> -->            
             <script src="<?php echo API_FOLDER ?>/finanzen.js" type="text/javascript"></script>
             <script src="<?php echo API_FOLDER ?>/finanzen_umsaetze.js" type="text/javascript"></script>           
             <script src="<?php echo API_FOLDER ?>/stammdaten_kategorien.js" type="text/javascript"></script>
