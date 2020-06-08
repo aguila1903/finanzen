@@ -39,7 +39,7 @@ if (isset($_SESSION['finanzen']['benutzer'])) {
     $sqlQuery = "Call logoutProc(" . $dbSyb->quote($_SESSION['finanzen']['benutzer']) . ")";
 
 
-// file_put_contents("logout.txt", $sqlQuery);
+file_put_contents("logout.txt", $sqlQuery);
 
     $rs = $dbSyb->Execute($sqlQuery);
 
@@ -56,11 +56,13 @@ if (isset($_SESSION['finanzen']['benutzer'])) {
 
     If (isset($rs->fields['ergebnis'])) {
         if ($rs->fields['ergebnis'] != 1) {
-            $out['response']['status'] = -4;
-            $out['response']['errors'] = array('errors' => "Es gab ein Problem beim Logout. Möglicherweise wurden Sie nicht korrekt ausgeloggt! </br>" . ($dbSyb->ErrorMsg()));
+            // $out['response']['status'] = -4;
+            // $out['response']['errors'] = array('errors' => "Es gab ein Problem beim Logout. Möglicherweise wurden Sie nicht korrekt ausgeloggt! </br>" . ($dbSyb->ErrorMsg()));
 
-            print json_encode($out);
-            return;
+            // print json_encode($out);
+            // return;
+			$_SESSION['finanzen'] = [];
+            header("Location: http://$host$uri/login");
         } else {
             $_SESSION['finanzen'] = [];
             header("Location: http://$host$uri/login");
