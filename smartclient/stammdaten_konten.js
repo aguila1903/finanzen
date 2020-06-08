@@ -429,7 +429,7 @@ isc.ToolStripButton.create({
             isc.say("Bitte erst ein Konto wählen");
         }
     },
-    prompt: "Kategorie editieren",
+    prompt: "Konto editieren",
     icon: "web/32/pencil.png",
     title: "",
     showDisabledIcon: false,
@@ -452,7 +452,7 @@ isc.ToolStripButton.create({
         dfStammKontenEdit.getField("action").setValue("add");
 
     },
-    prompt: "Kategorie editieren",
+    prompt: "Konto hinzufügen",
     icon: "web/32/add.png",
     title: "",
     showDisabledIcon: false,

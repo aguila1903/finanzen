@@ -359,7 +359,7 @@ isc.Window.create({
         }), HLayoutStmmKontenEdit]});
 
 isc.ToolStripButton.create({
-    ID: "tsbStammKontenEdit",
+    ID: "tsbStammZahlungEdit",
     count: 1,
     action: function ()
     {
@@ -387,7 +387,7 @@ isc.ToolStripButton.create({
 });
 
 isc.ToolStripButton.create({
-    ID: "tsbStammKontenAdd",
+    ID: "tsbStammZahlungAdd",
     count: 1,
     action: function ()
     {
@@ -412,18 +412,18 @@ isc.ToolStripButton.create({
 
 
 /*
- * GoTo: ************************ Lösche Konto *********************************
+ * GoTo: ************************ Lösche Zahlungsmittel ************************
  * =============================================================================
  */
 
 isc.ToolStripButton.create({
-    ID: "tsbStammKontenDelete",
+    ID: "tsbStammZahlungDelete",
     count: 1,
     action: function ()
     {
         if (lgZahlungStamm.getSelection().length == 1)
         {
-            isc.ask("Wollen Sie wirklich das ausgewählte Konto löschen?", function (value)
+            isc.ask("Wollen Sie wirklich das ausgewählte Zahlungsmittel löschen?", function (value)
             {
                 if (value)
                 {
@@ -434,7 +434,7 @@ isc.ToolStripButton.create({
                         if (_data.response.status === 0)
                         {  // Status 0 bedeutet Keine Fehler
 
-                            isc.say("Konto wurde erfolgreich gelöscht.");
+                            isc.say("Zahlungsmittel wurde erfolgreich gelöscht.");
                             lgZahlungStamm.invalidateCache();
 
                         } else
@@ -480,17 +480,17 @@ isc.Menu.create({
     showShadow: true,
     shadowDepth: 10,
     data: [
-        {title: tsbStammKontenAdd.prompt, icon: tsbStammKontenAdd.icon, click: function ()
+        {title: tsbStammZahlungAdd.prompt, icon: tsbStammZahlungAdd.icon, click: function ()
             {
-                tsbStammKontenAdd.action();
+                tsbStammZahlungAdd.action();
             }},
-        {title: tsbStammKontenEdit.prompt, icon: tsbStammKontenEdit.icon, click: function ()
+        {title: tsbStammZahlungEdit.prompt, icon: tsbStammZahlungEdit.icon, click: function ()
             {
-                tsbStammKontenEdit.action();
+                tsbStammZahlungEdit.action();
             }},
-        {title: tsbStammKontenDelete.prompt, icon: tsbStammKontenDelete.icon, click: function ()
+        {title: tsbStammZahlungDelete.prompt, icon: tsbStammZahlungDelete.icon, click: function ()
             {
-                tsbStammKontenDelete.action();
+                tsbStammZahlungDelete.action();
             }}
     ]
 });
@@ -515,7 +515,7 @@ isc.ToolStrip.create({
     width: "100%",
     backgroundImage: "backgrounds/leaves.jpg",
     height: 40,
-    members: [tsbStammKontenAdd, isc.LayoutSpacer.create({width: 10}), tsbStammKontenEdit, isc.LayoutSpacer.create({width: 10}), tsbStammKontenDelete, isc.LayoutSpacer.create({width: "*"}), lblStammZahlung, isc.LayoutSpacer.create({width: 5})]
+    members: [tsbStammZahlungAdd, isc.LayoutSpacer.create({width: 10}), tsbStammZahlungEdit, isc.LayoutSpacer.create({width: 10}), tsbStammZahlungDelete, isc.LayoutSpacer.create({width: "*"}), lblStammZahlung, isc.LayoutSpacer.create({width: 5})]
 });
 
 isc.VLayout.create({
