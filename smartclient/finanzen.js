@@ -150,6 +150,39 @@ chartClean = {
  * =============================================================================
  */
 
+function doUpdate(type_)
+{
+    RPCManager.send("", function (rpcResponse, data, rpcRequest)
+    {
+        var _data = isc.JSON.decode(data);
+        if (_data.response.status === 0)
+        {
+            var rueckmeldung = _data.response.data;
+
+            isc.say(rueckmeldung, function (value)
+            {
+                if (value)
+                {
+                    if (rueckmeldung != "Keine neuen Updates vorhanden!") // Es gab tatsächlich ein Update!
+                    {
+                        window.location.reload(true);
+                    }
+                }
+            });
+        } else if (_data.response.status === 4)
+        {
+            var _errors = _data.response.errors;
+            isc.say(_errors);
+        }
+    }, {// Übergabe der Parameter
+        actionURL: "update/update.php",
+        httpMethod: "POST",
+        contentType: "application/x-www-form-urlencoded",
+        useSimpleHttp: true,
+        params: {type: type_}
+    }); //Ende RPC
+}
+;
 
 function changeFunction(btnSave, btnRst, btnCls)
 {
@@ -818,6 +851,24 @@ isc.RibbonGroup.create({
     autoDraw: false
 });
 
+isc.RibbonGroup.create({
+    ID: "updateGroup",
+    title: "Update",
+    numRows: 1,
+    count: 0,
+    rowHeight: 26,
+//    colWidths: [10, 10, "*"],
+    controls: [
+        getIconButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Update</text>',
+          {orientation: "vertical", align: "center", colSpan: 2, largeIcon: "web/32/update.png", click: function ()
+              {
+                  doUpdate("menu");
+              }})
+
+    ],
+    autoDraw: false
+});
+
 isc.RibbonBar.create({
     ID: "ribbonBar",
     top: 30,
@@ -837,6 +888,7 @@ ribbonBar.addGroup(logoutGroup, 2);
 ribbonBar.addGroup(userGroup, 3);
 ribbonBar.addGroup(saveGroup, 0);
 ribbonBar.addGroup(loadGroup, 0);
+ribbonBar.addGroup(updateGroup, 0);
 /*
  ***************** ENDE RIBBONBAR USER LOGOUT ************************** 
  */
@@ -1511,6 +1563,7 @@ isc.VLayout.create({
 {
 
     VLayoutMainView.show();
+    doUpdate("auto");
     if (modul != "")
     {
         openNode(sidAdmin, modul);

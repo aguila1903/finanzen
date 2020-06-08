@@ -28,7 +28,6 @@ var refreshEinAusgabenListen = function (_form, _fieldName)
 
     return string;
 };
-
 function setCriteria()
 {
     criteriaAll = {
@@ -65,11 +64,7 @@ function fetchEinAusgaben(_form)
     var _monat_jahr = null;
     var _jahr = null;
     var _zahlungsmittel_id = null;
-
-
     _zahlungsmittel_id = refreshEinAusgabenListen(_form, "zahlungsmittel");
-
-
     if (typeof (_form.getField("monat_jahr").getValue()) !== noSearch)
     {
         _monat_jahr = refreshEinAusgabenListen(_form, "monat_jahr");
@@ -117,12 +112,9 @@ function fetchEinAusgaben(_form)
     lgEinAusgaben.fetchData({"jahr": _jahr, "monat_jahr": _monat_jahr, "enddatum": _enddatum, "art": _art, "typ": _typ, "datum": _datum,
         "konto": _kontonr, "vorgang": _vorgang, "herkunft": _herkunft, "interval": _interval,
         "kategorie": _kategorie, zahlungsmittel: _zahlungsmittel_id, counter: ++_form.counter});
-
     getSumEinAusgaben(totalsLabelEinAusgaben, "api/ds/einAusgabenDS.php", _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id);
-
 }
 ;
-
 function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id)
 {
 
@@ -150,7 +142,6 @@ function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _
 
 }
 ;
-
 function uploadDocEinAusgabe(_this, id)
 { // Dokument in der Dropzone wird hochgeladen
 
@@ -191,8 +182,6 @@ function uploadDocEinAusgabe(_this, id)
     });
 }
 ;
-
-
 function initDropZoneEinAusgabe()
 {
 
@@ -214,7 +203,6 @@ function initDropZoneEinAusgabe()
         var ID = lgEinAusgaben.getSelectedRecord().ID;
         uploadDocEinAusgabe(this, ID);
     });
-
     // Maximal nur 1 Datei erlaubt (maxFiles: 1 - dropzone.js) - Alles andere wird automatisch entfernt (Thumbnails)
     this.on("maxfilesexceeded", function (file)
     {
@@ -222,7 +210,6 @@ function initDropZoneEinAusgabe()
         // Add the button to the file preview element.
         file.previewElement.appendChild(removeButtonEinAusg); // instance 1
     });
-
     _thisEA = this;
     // Listen to the click event
 
@@ -233,7 +220,6 @@ function initDropZoneEinAusgabe()
         // Make sure the button click doesn't submit the form:
         e.preventDefault();
         e.stopPropagation();
-
         // Remove the file preview.
         _thisEA.removeFile(dropZoneEinAusgabe.dropzone.files[0]); // instance 1
         // If you want to the delete the file on the server as well,
@@ -243,14 +229,12 @@ function initDropZoneEinAusgabe()
 //            delDocument("input_" + pdf_timestamp + ".pdf");
 
     });
-
     this.on("error", function (file, res)
     {
         isc.say(res);
         // Add the button to the file preview element.
         file.previewElement.appendChild(removeButtonEinAusg);
     });
-
 }
 
 function drop(drop_zone, _form, _status, _list, _url)
@@ -280,27 +264,24 @@ function uploadFile(_form, _status, _list, _url)
         files = event.dataTransfer.files; // FileList object.
         // files is a FileList of File objects. List some properties.
         var output = [];
-
         for (var i = 0, f; f = files[i]; i++)
         {
             output.push('<li><strong>', f.name, '</strong> - ', f.size, ' bytes </li>');
             //  uploadFile(f, event);
 
-            var xhr = new XMLHttpRequest();    // den AJAX Request anlegen
+            var xhr = new XMLHttpRequest(); // den AJAX Request anlegen
             // Angeben der URL und des Requesttyps
             xhr.open('POST', _url); // Die Verbindung wird geöffnet
             xhr.responseType = "json";
-            var formdata = new FormData();    // Anlegen eines FormData Objekts zum Versenden unserer Datei
+            var formdata = new FormData(); // Anlegen eines FormData Objekts zum Versenden unserer Datei
 
             var ID = lgEinAusgaben.getSelectedRecord().ID;
             formdata.append('file', f);
             formdata.append('ID', ID);
-
-
             xhr.upload.addEventListener("progress", progressHandler(_status), false); // ist für den Übertragungsprozess verantwortlich u.a. für die Progressbar
             xhr.addEventListener("load", completeHandler(files.length), false); // Gibt die Antwort des Servers wieder bei abgeschlossener Übertragung
             xhr.addEventListener("error", errorHandler(_status), false); //Zeigt die Fehler-Texte an z.B. bei Fehlern im PHP Skript
-            xhr.send(formdata);    // Absenden des Requests
+            xhr.send(formdata); // Absenden des Requests
         }
         //isc.say('<ul>' + output.join('') + '</ul>');
 
@@ -328,7 +309,6 @@ function completeHandler(i)
         var response = event.target.response;
         isc.say(response);
         fetchEinAusgaben(dfEinAusgabenFilter);
-
     };
     //  document.getElementById('progressBar').value = 0; // Funktioniert wird aber nicht gebraucht
 
@@ -443,7 +423,6 @@ isc.DataSource.create({
             type: "text"
         }
     ]});
-
 isc.DataSource.create({
     ID: "einAusgabenSucheFelderDS",
     allowAdvancedCriteria: true,
@@ -547,8 +526,6 @@ isc.DataSource.create({
             type: "text"
         }
     ]});
-
-
 isc.DataSource.create({
     ID: "kontenEinAusDS",
     allowAdvancedCriteria: true,
@@ -592,7 +569,6 @@ isc.DataSource.create({
             type: "text"
         }
     ]});
-
 isc.DataSource.create({
     ID: "kategorienEinAusDS",
     allowAdvancedCriteria: true,
@@ -632,7 +608,6 @@ isc.DataSource.create({
             type: "text"
         }
     ]});
-
 isc.DataSource.create({
     ID: "zahlmittelEinAusDS",
     allowAdvancedCriteria: true,
@@ -677,7 +652,6 @@ isc.DataSource.create({
             type: "text"
         }
     ]});
-
 isc.DataSource.create({
     ID: "herkunftVorgangDS",
     allowAdvancedCriteria: true,
@@ -717,7 +691,6 @@ isc.DataSource.create({
             type: "text"
         }
     ]});
-
 isc.DataSource.create({
     ID: "bundleDS",
     allowAdvancedCriteria: true,
@@ -757,8 +730,6 @@ isc.DataSource.create({
             type: "text"
         }
     ]});
-
-
 /*
  * ******************** GoTo: DropZone *************************
  * -------------------------------------------------------------
@@ -779,9 +750,6 @@ isc.HTMLPane.create({
       '<div id="uploadListEinAusgaben"></div></div>'
 //    contents: '<div id="dropzone"><form class="dropzone needsclick" id="dropZoneEinAusgabe"> ' +'</form></div>'
 });
-
-
-
 //Dropzone.options.dropZoneEinAusgabe = {
 ////    acceptedFiles: "application/vnd.ms-excel",
 //    url: "api/upload_document.php",
@@ -834,7 +802,6 @@ isc.DynamicForm.create({
         }
     ]
 });
-
 /*
  * ******************* Ausgaben-Liste *******************************************
  * ------------------------------------------------------------------------------
@@ -855,7 +822,6 @@ isc.ToolStrip.create({
 
     ]
 });
-
 var hiliteArrayEinAusgabe =
   [
       {fieldName: "betrag",
@@ -877,7 +843,6 @@ var hiliteArrayEinAusgabe =
           id: 1
       }
   ];
-
 isc.ListGrid.create({
     ID: "lgEinAusgaben",
     count: 0,
@@ -896,19 +861,19 @@ isc.ListGrid.create({
     showGridSummary: false,
     showGroupSummary: false,
     groupStartOpen: "all",
-    groupByField: ['kategorie'],
-    margin: 0/*,
-     initialSort: [{
-     property: "datum",
-     direction: "ascending"
-     } {
-     property: "kategorie",
-     direction: "ascending"
-     }, {
-     property: "vorgang",
-     direction: "ascending"
-     }
-     ]*/,
+    groupByField: ['konto_bez', 'kategorie'],
+    margin: 0,
+    initialSort: [{
+            property: "datum",
+            direction: "ascending"
+        }, {
+            property: "kategorie",
+            direction: "ascending"
+        }, {
+            property: "vorgang",
+            direction: "ascending"
+        }
+    ],
     fields: [
         {
             name: "ID",
@@ -1018,15 +983,12 @@ isc.ListGrid.create({
         dfEinAusgaben.editRecord(record);
         dfEinAusgaben.getField("action").setValue("edit");
         wdEinAusgabe.setTitle("Editieren eines Vorgangs");
-
         setValue2Field(dfEinAusgaben, 'typ', record.typ);
         setValue2Field(dfEinAusgaben, 'datum', record.datum);
         setValue2Field(dfEinAusgaben, 'detail', record.detail);
         resetButtons(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
     }
 });
-
-
 /*
  * *************************** Ein-Ausgaben Form *******************************
  * =============================================================================
@@ -1392,7 +1354,6 @@ isc.DynamicForm.create({
                 }]
         }
     ]});
-
 isc.IButton.create({
     ID: "btnCloseEinAusgabe",
     type: "button",
@@ -1488,7 +1449,6 @@ isc.IButton.create({
                                     dfEinAusgaben.getField("action").setValue("add");
                                     wdEinAusgabe.setTitle("Hinzufügen eines neuen Vorgangs");
                                     dfEinAusgaben.getField("betrag").clearValue();
-
                                 } else
                                 {
                                     isc.Timer.setTimeout("btnSpeichernEinAusgabe.isLoadingEinAusgabeTimer()", 150);
@@ -1615,7 +1575,6 @@ isc.IButton.create({
             dfEinAusgaben.getField("dauer").hide();
         }
         resetButtons(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
-
     }});
 isc.HLayout.create({
     ID: "HLayoutEinAusgabe",
@@ -1627,8 +1586,6 @@ isc.HLayout.create({
         }), btnSpeichernEinAusgabe, isc.LayoutSpacer.create({
             width: 20
         }), btnResetEinAusgabe]});
-
-
 currentIcon = "famfam/sum.png";
 isc.Window.create({
     ID: "wdEinAusgabe",
@@ -1650,8 +1607,6 @@ isc.Window.create({
     items: [dfEinAusgaben, isc.LayoutSpacer.create({
             height: 20
         }), HLayoutEinAusgabe]});
-
-
 /*
  * ******************************** FILTER *************************************
  * =============================================================================
@@ -1719,7 +1674,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "jahr",
@@ -1792,7 +1746,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "monat_jahr",
@@ -1864,7 +1817,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "kategorie_id",
@@ -1924,7 +1876,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "datum",
@@ -1996,7 +1947,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "enddatum",
@@ -2054,7 +2004,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "art",
@@ -2112,7 +2061,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "typ",
@@ -2172,7 +2120,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "zahlungsmittel",
@@ -2287,7 +2234,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "vorgang",
@@ -2347,7 +2293,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "herkunft",
@@ -2407,7 +2352,6 @@ isc.DynamicForm.create({
             changed: function (form, item, value)
             {
                 fetchEinAusgaben(dfEinAusgabenFilter);
-
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "interval",
@@ -2425,7 +2369,6 @@ isc.DynamicForm.create({
         }
     ]
 });
-
 /*
  * *************************** ToolStrip Button ********************************
  * =============================================================================
@@ -2441,7 +2384,6 @@ isc.ToolStripButton.create({
         dfEinAusgaben.getField("action").setValue("add");
         wdEinAusgabe.setTitle("Hinzufügen eines neuen Vorgangs");
         setValue2Field(dfEinAusgaben, "detail", "N");
-
     },
     prompt: "Neuen Datensatz anlegen",
     icon: "web/32/add.png",
@@ -2469,7 +2411,6 @@ isc.ToolStripButton.create({
 //            setValue2Field(dfEinAusgaben, 'detail', record.detail);
             setValue2Field(dfEinAusgaben, "detail", record.detail);
             resetButtons(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
-
         } else
         {
             isc.say("Bitte erst einen Datensatz wählen");
@@ -2505,7 +2446,6 @@ isc.ToolStripButton.create({
 
                             isc.say("Vorgang wurde erfolgreich gelöscht.");
                             fetchEinAusgaben(dfEinAusgabenFilter);
-
                         } else
                         { // Wenn die Validierungen Fehler aufweisen dann:                            
                             var _errors = _data.response.errors;
@@ -2522,7 +2462,6 @@ isc.ToolStripButton.create({
                     }); //Ende RPC   
                 }
             });
-
         } else
         {
             isc.say("Bitte erst einen Datensatz wählen");
@@ -2537,7 +2476,6 @@ isc.ToolStripButton.create({
     hoverWidth: 100,
     hoverDelay: 700
 });
-
 isc.ToolStripButton.create({
     ID: "tsbEinAusgabenDeleteDoc",
     count: 1,
@@ -2557,7 +2495,6 @@ isc.ToolStripButton.create({
 
                             isc.say("Dokument wurde erfolgreich gelöscht.");
                             fetchEinAusgaben(dfEinAusgabenFilter);
-
                         } else
                         { // Wenn die Validierungen Fehler aufweisen dann:                            
                             var _errors = _data.response.errors;
@@ -2576,7 +2513,6 @@ isc.ToolStripButton.create({
                     }); //Ende RPC   
                 }
             });
-
         } else
         {
             isc.say("Bitte erst einen Datensatz wählen");
@@ -2591,7 +2527,6 @@ isc.ToolStripButton.create({
     hoverWidth: 100,
     hoverDelay: 700
 });
-
 isc.ToolStripButton.create({
     ID: "tsbEinAusgabeRefresh",
     count: 1,
@@ -2608,7 +2543,6 @@ isc.ToolStripButton.create({
     hoverWidth: 100,
     hoverDelay: 700
 });
-
 isc.ToolStripButton.create({
     ID: "tsbUploadDocEinAusgabe",
     count: 0,
@@ -2646,8 +2580,6 @@ isc.ToolStripButton.create({
     hoverWidth: 100,
     hoverDelay: 700
 });
-
-
 /*
  * *********************** ANFANG MENU *************************
  * -------------------------------------------------------------
@@ -2688,7 +2620,6 @@ isc.Menu.create({
             }}
     ]
 });
-
 isc.MenuButton.create({
     ID: "mbEinAusgabe",
     autoDraw: false,
@@ -2696,7 +2627,6 @@ isc.MenuButton.create({
     width: 100,
     menu: menuEinAusgabe
 });
-
 /*
  * *************************** Layouts *****************************************
  * =============================================================================
@@ -2710,8 +2640,6 @@ isc.Label.create({
     align: "center",
     contents: '<text style="color:' + titleLableColor + '; font-size:' + titleLableFontSize + '; font-family:' + titleLableFontFamily + '; text-decoration:none;">Ein- und Ausgaben Übersicht</text>'
 });
-
-
 isc.ToolStrip.create({
     ID: "tsEinAusgabe",
     width: "100%",
@@ -2725,7 +2653,6 @@ isc.ToolStrip.create({
      tsbUploadDocEinAusgabe, */ isc.LayoutSpacer.create({width: "*"}),
         lblEinAusgabe, isc.LayoutSpacer.create({width: 5})]
 });
-
 isc.HLayout.create({
     ID: "HLayoutEinAusgabeFilter",
     height: "100%",
@@ -2733,7 +2660,6 @@ isc.HLayout.create({
     overflow: "auto",
     showResizeBar: true,
     members: [dfEinAusgabenFilter]});
-
 isc.VLayout.create({
     ID: "VLayoutEinAusgabe",
 //    overflow: "scroll",
@@ -2741,13 +2667,11 @@ isc.VLayout.create({
     width: "100%",
     members: [tsEinAusgabe, htmlPaneDropZoneEinAusgabe, lgEinAusgaben]
 });
-
 isc.HLayout.create({
     ID: "HLayoutEinAusgabeFilter_List",
     height: "100%",
     width: "100%",
     members: [HLayoutEinAusgabeFilter, VLayoutEinAusgabe]});
-
 /*
  * *************************** Initialisierung *********************************
  * =============================================================================

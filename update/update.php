@@ -6,6 +6,7 @@ require_once('conf.php');
 $date = date("Y-m-d");
 $out = array();
 $update = "";
+
 //file_put_contents('update.txt', 'Ich war hier');
 // Functions
 function logUpdate($log_file, $log) {
@@ -14,22 +15,27 @@ function logUpdate($log_file, $log) {
 
 function domainAvailable($strDomain) {
     $rCurlHandle = curl_init($strDomain);
-
     curl_setopt($rCurlHandle, CURLOPT_CONNECTTIMEOUT, 10);
     curl_setopt($rCurlHandle, CURLOPT_HEADER, TRUE);
     curl_setopt($rCurlHandle, CURLOPT_NOBODY, TRUE);
     curl_setopt($rCurlHandle, CURLOPT_RETURNTRANSFER, TRUE);
 
     $strResponse = curl_exec($rCurlHandle);
+//    file_put_contents("update.txt", print_r($strResponse, true));
 
     curl_close($rCurlHandle);
 
     if (!$strResponse) {
         return FALSE;
     }
-
     return TRUE;
 }
+
+function url_check($url) {
+    $urlheaders = @get_headers($url);
+    file_put_contents("update.txt", print_r($urlheaders, true));
+    return is_array($urlheaders) ? preg_match('/^HTTP\\/\\d+\\.\\d+\\s+2\\d\\d\\s+.*$/', $urlheaders[0]) : false;
+};
 
 function updateCheck($update_logs) {
 
@@ -37,7 +43,6 @@ function updateCheck($update_logs) {
     $update = shell_exec("git pull -f");
     $date = date("Y-m-d H:i:s") . ": \n";
     if (trim($update) != "Already up to date." && $update !== null) {
-
         logUpdate($update_logs, "$date$update\n");
     } else {
         $update = "nope";
@@ -69,6 +74,7 @@ $sql_mysql = PATH_MYSQL . "mysql.exe";
 if (!is_dir($update_logs_dir)) {
     mkdir($update_logs_dir, 0777, true);
 }
+
 
 
 //Git
@@ -112,7 +118,7 @@ if ($update == "nope" && $type == "auto") {
     $text = "<br /><br /><b>Es wurden Updates durchgeführt!</b><br />Mit dem Klicken auf OK wird die Seite neugestartet, damit die Updates wirksam werden.";
 }
 $out['response']['errors'] = array();
-$out['response']['data'] = $update.$text;
+$out['response']['data'] = $update . $text;
 
 print json_encode($out);
 ?>
