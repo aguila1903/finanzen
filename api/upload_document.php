@@ -87,17 +87,46 @@ if (is_dir($path2) != 1) {
     mkdir($path2, 0775, true);
 }
 
-$aExt = explode(".",$name_array);
-$i = count($aExt)-1;
+$aExt = explode(".", $name_array);
+$i = count($aExt) - 1;
 
 $fileName = $ID . "." . $aExt[$i];
 $result = json_encode("Datei beinhaltet keine Daten zum auswerten.");
+
+
+$querySQL = "Select bundle from einausgaben Where ID = $ID";
+
+$rs = $dbSyb->Execute($querySQL);
+
+$where = " Where ID = $ID";
+$ii = 0;
+$IDs = [];
+if ($rs) {
+    $bundle = trim($rs->fields['bundle']);
+    if ($bundle != "") {
+        $querySQL = "Select ID from einausgaben Where bundle = '$bundle'";
+        $rs = $dbSyb->Execute($querySQL);
+        while (!$rs->EOF) {
+            $IDs[$ii] = $rs->fields['ID'];
+            $ii++;
+            $rs->MoveNext();
+        }
+        if (count($IDs) > 0) {
+            $IDs[$ii] = $ID;
+            file_put_contents("upload_doc.txt", print_r($IDs, true));
+            $sID = implode(",", $IDs);
+            $where = " Where ID in ($sID)";
+        }
+    }
+}
+$rs->Close();
+
 
 if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
 
     $file = file_get_contents($path2 . $fileName, true);
 
-    $querySQL = "Update einausgaben set dokument = {$dbSyb->Quote($fileName)} Where ID = $ID";
+    $querySQL = "Update einausgaben set dokument = {$dbSyb->Quote($fileName)} $where;";
 
     $rs = $dbSyb->Execute($querySQL);
 
