@@ -40,7 +40,7 @@ function url_check($url) {
 function updateCheck($update_logs) {
 
 
-    $update = shell_exec("git pull -f");
+    $update = shell_exec(PATH_GIT."git pull -f");
     $date = date("Y-m-d H:i:s") . ": \n";
     if (trim($update) != "Already up to date." && $update !== null) {
         logUpdate($update_logs, "$date$update\n");
