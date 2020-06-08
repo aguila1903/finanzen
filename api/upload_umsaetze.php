@@ -34,7 +34,7 @@ if (isset($_FILES['file'])) {
     $size_array = $_FILES['file']['size'];
     $error_array = $_FILES['file']['error'];
 
-    if (preg_match("/csv/i", $type_array) != 1) {
+    if (preg_match("/csv/i", $name_array) != 1) {
         print json_encode("Error: Datei ist keine CSV-Datei");
         return;
     }
