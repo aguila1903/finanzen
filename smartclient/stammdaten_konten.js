@@ -122,7 +122,7 @@ isc.ListGrid.create({
         {
             name: "kontonr",
             width: 200,
-            title: "Kontonr"
+            title: "IBAN"
         }, {
             name: "bezeichnung",
             width: "*",
@@ -195,7 +195,7 @@ isc.DynamicForm.create({
             }
         }, {
             name: "kontonr",
-            title: "Kontonummer",
+            title: "IBAN",
             width: 300,
             required: true,
             type: "text",

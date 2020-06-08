@@ -35,7 +35,7 @@ if (isset($_FILES['file'])) {
     $error_array = $_FILES['file']['error'];
 
     if (preg_match("/excel/i", $type_array) != 1) {
-        print json_encode("Datei ist keine CSV-Datei");
+        print json_encode("Error: Datei ist keine CSV-Datei");
         return;
     }
 
