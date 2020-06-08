@@ -500,7 +500,7 @@ isc.HTMLPane.create({
 });
 
 Dropzone.options.dropZoneUmsaetze = {
-    acceptedFiles: "application/vnd.ms-excel",
+//    acceptedFiles: "application/vnd.ms-excel",
     url: "api/upload_umsaetze.php",
     method: "post",
     init: initDropZoneUmsaetze
