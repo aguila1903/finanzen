@@ -1549,7 +1549,7 @@ isc.DynamicForm.create({
                 changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
             }, icons: [{
                     src: "web/16/add.png",
-                    name: "icoKategorieAdd",
+                    name: "kategorien",
                     width: 16,
                     height: 16,
                     prompt: "Neue Kategorie hinzufügen",
@@ -1633,7 +1633,7 @@ isc.DynamicForm.create({
                 changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
             }, icons: [{
                     src: "web/16/delete.png",
-                    name: "icoKategorieAdd",
+                    name: "vorgang",
                     width: 16,
                     height: 16,
                     prompt: "Feldinhalt löschen",
@@ -1670,7 +1670,7 @@ isc.DynamicForm.create({
 
             }, icons: [{
                     src: "web/16/delete.png",
-                    name: "icoKategorieAdd",
+                    name: "herkunft",
                     width: 16,
                     height: 16,
                     prompt: "Feldinhalt löschen",
@@ -1706,7 +1706,7 @@ isc.DynamicForm.create({
                 changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
             }, icons: [{
                     src: "web/16/delete.png",
-                    name: "icoKategorieAdd",
+                    name: "zahlungsmittel_id",
                     width: 16,
                     height: 16,
                     prompt: "Feldinhalt löschen",
