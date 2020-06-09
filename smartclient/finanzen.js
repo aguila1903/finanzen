@@ -623,7 +623,7 @@ mainTree = isc.Tree.create({
         {
             Id: "11",
             parentId: "1",
-            icon: "famfam/report.png",
+            icon: "web/16/columnchart.png",
             title: "Dashboard",
             isFolder: false,
             Name: "VLayoutDashboard"
