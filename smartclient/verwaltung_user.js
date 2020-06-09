@@ -632,7 +632,9 @@ isc.IButton.create({
                     UserID: dfEditUserAdmin.getField("UserID").getValue(),
                     admin: dfEditUserAdmin.getField("admin").getValue(),
                     email: dfEditUserAdmin.getField("email").getValue(),
-                    status: dfEditUserAdmin.getField("status").getValue()}
+                    status: dfEditUserAdmin.getField("status").getValue(),
+                    sidAdmin: sidAdmin
+                }
 
             }); //Ende RPC
         } else
@@ -1016,7 +1018,8 @@ isc.IButton.create({
                     admin: dfUserAdd.getField("admin").getValue(),
                     status: dfUserAdd.getField("status").getValue(),
                     email: dfUserAdd.getField("email").getValue(),
-                    benutzer: dfUserAdd.getField("benutzer").getValue()}
+                    benutzer: dfUserAdd.getField("benutzer").getValue(),
+                    sidAdmin: sidAdmin}
 
             }); //Ende RPC
         } else

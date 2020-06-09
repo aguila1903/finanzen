@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once('adodb5/adodb.inc.php');
 require_once('conf.php');
@@ -31,8 +32,8 @@ if (!$dbSyb->IsConnected()) {
 $dbSyb->debug = false;
 
 
-if (isset($_REQUEST["UserID"])) {
-    $UserID = $_REQUEST["UserID"];
+if (isset($_POST["UserID"])) {
+    $UserID = $_POST["UserID"];
 } else {
     $out['response']['status'] = -1;
     $out['response']['errors'] = array('UserID' => "UserID fehlt!");
@@ -43,8 +44,8 @@ if (isset($_REQUEST["UserID"])) {
 
 
 
-if (isset($_REQUEST["admin"])) {
-    $admin = $_REQUEST["admin"];
+if (isset($_POST["admin"])) {
+    $admin = $_POST["admin"];
     if ($admin != "null" && $admin != "") {
         if ((preg_match("/^[JN]{1}?$/", trim($admin))) == 0) {
 
@@ -70,8 +71,36 @@ if (isset($_REQUEST["admin"])) {
 
     return;
 }
-if (isset($_REQUEST["status"])) {
-    $status = $_REQUEST["status"];
+
+if (isset($_POST["sidAdmin"])) {
+    $sidAdmin = $_POST["sidAdmin"];
+    if ($sidAdmin != "null" && $sidAdmin != "") {
+        if ((preg_match("/^[JN]{1}?$/", trim($sidAdmin))) == 0) {
+
+            $out['response']['status'] = -4;
+            $out['response']['errors'] = array('admin' => "Bitte den sidAdmin prüfen.");
+
+            print json_encode($out);
+            return;
+        }
+    } else {
+        $out['response']['status'] = -1;
+        $out['response']['errors'] = array('admin' => "sidAdmin fehlt!");
+
+        print json_encode($out);
+
+        return;
+    }
+} else {
+    $out['response']['status'] = -1;
+    $out['response']['errors'] = array('admin' => "sidAdmin fehlt!");
+
+    print json_encode($out);
+
+    return;
+}
+if (isset($_POST["status"])) {
+    $status = $_POST["status"];
     if ($status != "null" && $status != "") {
         if ((preg_match("/^[OB]{1}?$/", trim($status))) == 0) {
 
@@ -98,8 +127,8 @@ if (isset($_REQUEST["status"])) {
     return;
 }
 
-if (isset($_REQUEST["email"])) {
-    $e_mail = $_REQUEST["email"];
+if (isset($_POST["email"])) {
+    $e_mail = $_POST["email"];
 
     if ($e_mail != "" && $e_mail != "null") {
         if ((preg_match("/^(([a-zA-Z0-9_.\\-+])+@(([a-zA-Z0-9\\-])+\\.)+[a-zA-Z0-9]{2,4})|([ ])|([null])$/", trim(trim($e_mail)))) == 0) {
@@ -120,7 +149,13 @@ if (isset($_REQUEST["email"])) {
 }
 
 
+if ($sidAdmin == ADMIN_STD && ($admin != ADMIN_STD)) { // Es handelt sich um keinen Admin aber der übergebene Admin-Parameter ist nicht der Standard-Admin
+    $out['response']['status'] = -4;
+    $out['response']['errors'] = array('admin' => "Sie sind nicht dazu berechtigt, den User auf admin zu setzen!");
 
+    print json_encode($out);
+    return;
+}
 
 $sqlQuery = "call editUser2("
         . $UserID .

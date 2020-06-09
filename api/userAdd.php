@@ -77,9 +77,18 @@ if (isset($_POST["email"])) {
 
 if (isset($_POST["admin"])) {
     $admin = $_POST["admin"];
-    if ((preg_match("/^[JNjn]{1}$/", trim($admin))) == 0) {
-        $out['response']['status'] = -4;
-        $out['response']['errors'] = array('admin' => "Fehler beim Eintrag Admin");
+    if ($admin != "null" && $admin != "") {
+        if ((preg_match("/^[JN]{1}?$/", trim($admin))) == 0) {
+
+            $out['response']['status'] = -4;
+            $out['response']['errors'] = array('admin' => "Bitte das Feld Admin prüfen.");
+
+            print json_encode($out);
+            return;
+        }
+    } else {
+        $out['response']['status'] = -1;
+        $out['response']['errors'] = array('admin' => "Admin fehlt!");
 
         print json_encode($out);
 
@@ -87,9 +96,39 @@ if (isset($_POST["admin"])) {
     }
 } else {
     $out['response']['status'] = -1;
-    $out['response']['errors'] = array('admin' => "Bitte den User-Typ eintragen");
+    $out['response']['errors'] = array('admin' => "Admin fehlt!");
 
     print json_encode($out);
+
+    return;
+}
+
+
+if (isset($_POST["sidAdmin"])) {
+    $sidAdmin = $_POST["sidAdmin"];
+    if ($sidAdmin != "null" && $sidAdmin != "") {
+        if ((preg_match("/^[JN]{1}?$/", trim($sidAdmin))) == 0) {
+
+            $out['response']['status'] = -4;
+            $out['response']['errors'] = array('admin' => "Bitte den sidAdmin prüfen.");
+
+            print json_encode($out);
+            return;
+        }
+    } else {
+        $out['response']['status'] = -1;
+        $out['response']['errors'] = array('admin' => "sidAdmin fehlt!");
+
+        print json_encode($out);
+
+        return;
+    }
+} else {
+    $out['response']['status'] = -1;
+    $out['response']['errors'] = array('admin' => "sidAdmin fehlt!");
+
+    print json_encode($out);
+
     return;
 }
 
@@ -141,6 +180,13 @@ if (isset($_POST["passwort2"])) {
     return;
 }
 
+if ($sidAdmin == ADMIN_STD && ($admin != ADMIN_STD)) { // Es handelt sich um keinen Admin aber der übergebene Admin-Parameter ist nicht der Standard-Admin
+    $out['response']['status'] = -4;
+    $out['response']['errors'] = array('admin' => "Sie sind nicht dazu berechtigt, den User auf admin zu setzen!");
+
+    print json_encode($out);
+    return;
+}
 
 $querySQL = "call UserAddProc (" . $dbSyb->Quote($benutzer)
         . "," . $dbSyb->Quote(base64_encode($_passwort)) .
