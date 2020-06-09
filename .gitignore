@@ -23,5 +23,7 @@ api/tools/toRaw_txt.cmd
 api/tools/copy.cmd
 api/tools/info.txt
 api/tools/taksitler.csv
+start.php
+start.php.bk
 update.cmd
 push.cmd

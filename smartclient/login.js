@@ -50,7 +50,7 @@ function handleResponse()
         {
             document.getElementById("antwort").innerHTML = rueckmeldung["text"];
 			// Hier können Deeplinks gesetzt werden
-            window.open(path + '/finanzen/start', '_self', false);  
+            window.open(path + '/finanzen/compile', '_self', false);  
         } else
         {
             document.getElementById("antwort").innerHTML = rueckmeldung["text"];

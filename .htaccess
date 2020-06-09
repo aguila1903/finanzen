@@ -4,8 +4,9 @@ RewriteBase /finanzen
 
 RewriteRule    ^login$                  index.php                    [T=application/x-httpd-cgi,QSA,NC]
 RewriteRule    ^home$                   login.php                    [T=application/x-httpd-cgi,QSA,NC]
-RewriteRule    ^start$              	start.php      				 [T=application/x-httpd-cgi,QSA,NC]
-RewriteRule    ^register$              	register.php      			 [T=application/x-httpd-cgi,QSA,NC]
+RewriteRule    ^start$              	start.php      	             [T=application/x-httpd-cgi,QSA,NC]
+RewriteRule    ^compile$              	genStart.php      	     [T=application/x-httpd-cgi,QSA,NC]
+RewriteRule    ^register$              	register.php      	     [T=application/x-httpd-cgi,QSA,NC]
 
 </IfModule>
 Options -Indexes
