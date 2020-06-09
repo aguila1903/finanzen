@@ -359,23 +359,6 @@ isc.HLayout.create({
         listeSiebterMonat, listeAchterMonat, listeNeunterMonat, listeZehnterMonat, listeElfterMonat, listeZwoelfterMonat]
 
 });
-//isc.HLayout.create({
-//    ID: "HLayoutJahresPrognose2",
-//    height: "50%",
-//    width: "100%",
-//    members: [listeSiebterMonat, listeAchterMonat, listeNeunterMonat, listeZehnterMonat, listeElfterMonat, listeZwoelfterMonat]
-//
-//});
-
-isc.VLayout.create({
-    ID: "VLayoutJahresPrognose",
-    height: "100%",
-    width: "100%",
-    members: [HLayoutJahresPrognose/*, HLayoutJahresPrognose2*/]
-
-});
-
-
 
 /*
  * *************************** Layouts *****************************************

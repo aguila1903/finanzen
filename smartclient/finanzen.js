@@ -1526,11 +1526,18 @@ isc.HLayout.create({
 });
 
 isc.VLayout.create({
-    ID: "VLayoutDashboard",
+    ID: "VLayoutDashboardGraphics",
     height: "100%",
     overflow: "scroll",
     width: "100%",
-    members: [tsDashboard, HLayoutDashboard, HLayoutDashboardPie]
+    members: [HLayoutDashboard, HLayoutDashboardPie]
+});
+
+isc.VLayout.create({
+    ID: "VLayoutDashboard",
+    height: "100%",
+    width: "100%",
+    members: [tsDashboard, VLayoutDashboardGraphics]
 });
 
 
