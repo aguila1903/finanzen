@@ -34,7 +34,10 @@ if (!$dbSyb->IsConnected()) {
 
 $dbSyb->debug = false;
 
-$querySQL = "call dashboard_ein_kat();";
+$querySQL = "SELECT SUM(ifnull(betrag,0)) AS summe, herkunft, COUNT(*)
+FROM  einausgaben e 
+WHERE e.art = 'A' AND date_format(datum, \"%Y%m%d\") BETWEEN date_format(CURDATE(), \"%Y%m01\") and CURDATE() -- AND typ = 'V'
+GROUP BY herkunft;";
 
 
 $rs = $dbSyb->Execute($querySQL);
@@ -51,11 +54,11 @@ if (!$rs) {
 else {
 
     $i = 0;
-    while (!$rs->EOF) {  
-        $data[$i]['summe'] = $rs->fields['summe'];
-        $data[$i]['kategorie'] = $rs->fields['bezeichnung'];
+    while (!$rs->EOF) {
+        $data[$i]['summe'] = $rs->fields['summe'] * (-1);
+        $data[$i]['herkunft'] = $rs->fields['herkunft'];
         $i++;
-     
+
 
         // den n�chsten Datensatz lesen
         $rs->MoveNext();

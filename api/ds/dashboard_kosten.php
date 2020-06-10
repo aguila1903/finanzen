@@ -1,7 +1,6 @@
 <?php
 
 session_start();
-include 'wechselkursHist.php';
 require_once('adodb5/adodb.inc.php');
 require_once('conf.php');
 

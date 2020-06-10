@@ -91,11 +91,11 @@ if (domainAvailable('https://github.com/')) {
 if (is_file($update_sql_new)) {//Es befindet sich eine Datei im sql-update Ordner
     if (is_file($sql_mysql) && is_file($sql_dump)) { // die mysql-Tools konnten gefunden werden
         //Vor dem Update: Sichern der Datenbank
-        $cmd_backup = "$sql_dump -u" . user . " -p" . psw . " " . db . " > $backup_file --routines ";
+        $cmd_backup = "$sql_dump -u".DB_USER. " -p".DB_PW." ". DB_NAME . " > $backup_file --routines ";
         $batch_backup = shell_exec($cmd_backup);
 
         //Laden der neuen Datenbank-Daten
-        $cmd_update = "$sql_mysql -u" . user . " -p" . psw . " " . db . " < $update_sql_new";
+        $cmd_update = "$sql_mysql -u".DB_USER. " -p".DB_PW." ". DB_NAME . " --comments < $update_sql_new";
         $batch_update = shell_exec($cmd_update);
         logUpdate($update_logs, "DB UPDATE: $batch_update\n");
 

@@ -117,6 +117,8 @@ pages = {
             amChartsDashboardEinnahmen();
             amChartsDashboardAusgKat();
             amChartsDashboardEinKat();
+            amChartsDashboardVorgang();
+            amChartsDashboardHerkunft();
         },
         cat: "Dashboard",
         treenode: {
@@ -134,7 +136,9 @@ chartClean = {
     2: "htmlPaneDashboardKosten",
     3: "htmlPaneDashboardEinnahmen",
     4: "htmlPaneDashboardEinKat",
-    5: "htmlPaneDashboardAusgKat"
+    5: "htmlPaneDashboardAusgKat",
+    6: "htmlPaneDashboardVorgang",
+    7: "htmlPaneDashboardHerkunft"
 };
 
 
@@ -426,7 +430,7 @@ var amChartsDashboardAusgKat = function ()
 {
 
     htmlPaneDashboardAusgKat.setContents("");
-    htmlPaneDashboardAusgKat.setContents("<div id='divGrafikDashboardAusgKat' style='width: 100%; height: 60%; padding-top: 1px;' ; ></div>");
+    htmlPaneDashboardAusgKat.setContents("<div id='divGrafikDashboardAusgKat' style='width: 100%; height: 90%; padding-top: 1px;' ; ></div>");
     RPCManager.send("", function (rpcResponse, data, rpcRequest)
     {
         _data = isc.JSON.decode(data);
@@ -447,6 +451,7 @@ var amChartsDashboardAusgKat = function ()
         chartAusgKat.outlineAlpha = 0.8;
         chartAusgKat.outlineThickness = 2;
         chartAusgKat.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
+        chartAusgKat.labelText = "[[title]]: [[summe]] €";
         // this makes the chartAusgKat 3D
 //        chartAusgKat.depth3D = 15;
 //        chartAusgKat.angle = 30;
@@ -470,7 +475,7 @@ var amChartsDashboardEinKat = function ()
 {
 
     htmlPaneDashboardEinKat.setContents("");
-    htmlPaneDashboardEinKat.setContents("<div id='divGrafikDashboardEinKat' style='width: 100%; height: 60%; padding-top: 1px;' ; ></div>");
+    htmlPaneDashboardEinKat.setContents("<div id='divGrafikDashboardEinKat' style='width: 100%; height: 90%; padding-top: 1px;' ; ></div>");
     RPCManager.send("", function (rpcResponse, data, rpcRequest)
     {
         _data = isc.JSON.decode(data);
@@ -478,32 +483,124 @@ var amChartsDashboardEinKat = function ()
 
 
         // SERIAL CHART
-        chartAusgKat = new AmCharts.AmPieChart();
-        chartAusgKat.dataProvider = chartData;
-        chartAusgKat.amLink = "";
-        chartAusgKat.titles = [{"text": "Einnahmen nach Kategorien",
+        chartEinKat = new AmCharts.AmPieChart();
+        chartEinKat.dataProvider = chartData;
+        chartEinKat.amLink = "";
+        chartEinKat.titles = [{"text": "Einnahmen nach Kategorien",
                 "size": 20,
                 "color": "#808080",
                 "bold": true
             }];
-        chartAusgKat.titleField = "kategorie";
-        chartAusgKat.valueField = "summe";
-        chartAusgKat.outlineColor = "#FFFFFF";
-        chartAusgKat.outlineAlpha = 0.8;
-        chartAusgKat.outlineThickness = 2;
-        chartAusgKat.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
+        chartEinKat.titleField = "kategorie";
+        chartEinKat.valueField = "summe";
+        chartEinKat.outlineColor = "#FFFFFF";
+        chartEinKat.outlineAlpha = 0.8;
+        chartEinKat.outlineThickness = 2;
+        chartEinKat.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
+        chartEinKat.labelText = "[[title]]: [[summe]] €";
         // this makes the chartAusgKat 3D
 //        chartAusgKat.depth3D = 15;
 //        chartAusgKat.angle = 30;
-        chartAusgKat.innerRadius = "10%";
-        chartAusgKat.labelRadius = 10;
+        chartEinKat.innerRadius = "10%";
+        chartEinKat.labelRadius = 10;
 
-        chartAusgKat.startDuration = 1;
-        chartAusgKat.startEffect = "bounce";
-        chartAusgKat.write('divGrafikDashboardEinKat');
+        chartEinKat.startDuration = 1;
+        chartEinKat.startEffect = "bounce";
+        chartEinKat.write('divGrafikDashboardEinKat');
 
     }, {
         actionURL: "api/ds/dashboard_ein_kat.php",
+        httpMethod: "GET",
+        contentType: "application/x-www-form-urlencoded",
+        useSimpleHttp: true,
+        params: {count: ++counterDashboard}
+    }); // Ende RPC
+};
+
+var amChartsDashboardVorgang = function ()
+{
+
+    htmlPaneDashboardVorgang.setContents("");
+    htmlPaneDashboardVorgang.setContents("<div id='divGrafikDashboardVorgang' style='width: 100%; height: 90%; padding-top: 1px;' ; ></div>");
+    RPCManager.send("", function (rpcResponse, data, rpcRequest)
+    {
+        _data = isc.JSON.decode(data);
+        var chartData = _data.response.data;
+
+
+        // SERIAL CHART
+        chartVorgang = new AmCharts.AmPieChart();
+        chartVorgang.dataProvider = chartData;
+        chartVorgang.amLink = "";
+        chartVorgang.titles = [{"text": "Ausgaben nach Vorgängen",
+                "size": 20,
+                "color": "#808080",
+                "bold": true
+            }];
+        chartVorgang.titleField = "vorgang";
+        chartVorgang.valueField = "summe";
+        chartVorgang.outlineColor = "#FFFFFF";
+        chartVorgang.outlineAlpha = 0.8;
+        chartVorgang.outlineThickness = 2;
+        chartVorgang.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
+        chartVorgang.labelText = "[[title]]: [[summe]] €";
+        // this makes the chartAusgKat 3D
+//        chartAusgKat.depth3D = 15;
+//        chartAusgKat.angle = 30;
+        chartVorgang.innerRadius = "10%";
+        chartVorgang.labelRadius = 10;
+
+        chartVorgang.startDuration = 1;
+        chartVorgang.startEffect = "bounce";
+        chartVorgang.write('divGrafikDashboardVorgang');
+
+    }, {
+        actionURL: "api/ds/dashboard_vorgang.php",
+        httpMethod: "GET",
+        contentType: "application/x-www-form-urlencoded",
+        useSimpleHttp: true,
+        params: {count: ++counterDashboard}
+    }); // Ende RPC
+};
+
+var amChartsDashboardHerkunft = function ()
+{
+    htmlPaneDashboardHerkunft.setContents("");
+    htmlPaneDashboardHerkunft.setContents("<div id='divGrafikDashboardHerkunft' style='width: 100%; height: 90%; padding-top: 1px;' ; ></div>");
+    RPCManager.send("", function (rpcResponse, data, rpcRequest)
+    {
+        _data = isc.JSON.decode(data);
+        var chartData = _data.response.data;
+
+
+        // SERIAL CHART
+        chartHerkunft = new AmCharts.AmPieChart();
+        chartHerkunft.dataProvider = chartData;
+        chartHerkunft.amLink = "";
+        chartHerkunft.titles = [{"text": "Ausgaben nach Herkunft",
+                "size": 20,
+                "color": "#808080",
+                "bold": true
+            }];
+        chartHerkunft.titleField = "herkunft";
+        chartHerkunft.valueField = "summe";
+        chartHerkunft.outlineColor = "#FFFFFF";
+        chartHerkunft.outlineAlpha = 0.8;
+        chartHerkunft.outlineThickness = 2;
+        chartHerkunft.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
+        chartHerkunft.labelText = "[[title]]: [[summe]] €";
+        // this makes the chartAusgKat 3D
+//        chartAusgKat.depth3D = 15;
+//        chartAusgKat.angle = 30;
+        chartHerkunft.innerRadius = "10%";
+        chartHerkunft.labelRadius = 10;
+
+        chartHerkunft.startDuration = 1;
+        chartHerkunft.startEffect = "bounce";
+        chartHerkunft.write('divGrafikDashboardHerkunft');
+
+    }, {
+        actionURL: "api/ds/dashboard_herkunft.php",
         httpMethod: "GET",
         contentType: "application/x-www-form-urlencoded",
         useSimpleHttp: true,
@@ -1470,7 +1567,7 @@ isc.HTMLPane.create({
 
 isc.HTMLPane.create({
     width: 900,
-    height: 900,
+    height: 600,
     padding: 5,
     ID: "htmlPaneDashboardAusgKat",
     styleName: "exampleTextBlock",
@@ -1478,9 +1575,25 @@ isc.HTMLPane.create({
 
 isc.HTMLPane.create({
     width: 900,
-    height: 900,
+    height: 600,
     padding: 5,
     ID: "htmlPaneDashboardEinKat",
+    styleName: "exampleTextBlock",
+    contents: ""});
+
+isc.HTMLPane.create({
+    width: 900,
+    height: 600,
+    padding: 5,
+    ID: "htmlPaneDashboardVorgang",
+    styleName: "exampleTextBlock",
+    contents: ""});
+
+isc.HTMLPane.create({
+    width: 900,
+    height: 600,
+    padding: 5,
+    ID: "htmlPaneDashboardHerkunft",
     styleName: "exampleTextBlock",
     contents: ""});
 
@@ -1525,12 +1638,19 @@ isc.HLayout.create({
     members: [htmlPaneDashboardAusgKat, htmlPaneDashboardEinKat]
 });
 
+isc.HLayout.create({
+    ID: "HLayoutDashboardHerkunftVorgangPie",
+    height: "100%",
+    width: "100%",
+    members: [htmlPaneDashboardVorgang, htmlPaneDashboardHerkunft]
+});
+
 isc.VLayout.create({
     ID: "VLayoutDashboardGraphics",
     height: "100%",
     overflow: "scroll",
     width: "100%",
-    members: [HLayoutDashboard, HLayoutDashboardPie]
+    members: [HLayoutDashboard, HLayoutDashboardPie, HLayoutDashboardHerkunftVorgangPie]
 });
 
 isc.VLayout.create({
