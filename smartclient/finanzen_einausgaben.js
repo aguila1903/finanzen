@@ -1138,6 +1138,8 @@ isc.DynamicForm.create({
             name: "datum",
             title: "Datum",
             type: "date",
+            startDate: "01/01/2010",
+            endDate: "31/12/2099",
             required: true,
             changed: function (form, item, value)
             {
@@ -1147,6 +1149,8 @@ isc.DynamicForm.create({
             name: "enddatum",
             title: "Enddatum",
             type: "date",
+            startDate: "01/01/2010",
+            endDate: "31/12/2099",
             required: true,
             changed: function (form, item, value)
             {

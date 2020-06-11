@@ -543,7 +543,7 @@ var amChartsDashboardVorgang = function ()
         chartVorgang.outlineAlpha = 0.8;
         chartVorgang.outlineThickness = 2;
         chartVorgang.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
-        chartVorgang.labelText = "[[title]]: [[summe]] €";
+        chartVorgang.labelText = "[[title]] ([[count]]): [[summe]] €";
         // this makes the chartAusgKat 3D
 //        chartAusgKat.depth3D = 15;
 //        chartAusgKat.angle = 30;
@@ -588,7 +588,7 @@ var amChartsDashboardHerkunft = function ()
         chartHerkunft.outlineAlpha = 0.8;
         chartHerkunft.outlineThickness = 2;
         chartHerkunft.balloonText = "[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>";
-        chartHerkunft.labelText = "[[title]]: [[summe]] €";
+        chartHerkunft.labelText = "[[title]] ([[count]]): [[summe]] €";
         // this makes the chartAusgKat 3D
 //        chartAusgKat.depth3D = 15;
 //        chartAusgKat.angle = 30;

@@ -34,7 +34,7 @@ if (!$dbSyb->IsConnected()) {
 
 $dbSyb->debug = false;
 
-$querySQL = "SELECT SUM(ifnull(betrag,0)) AS summe, vorgang, COUNT(*)
+$querySQL = "SELECT SUM(ifnull(betrag,0)) AS summe, vorgang, COUNT(*) as count
 FROM  einausgaben e 
 WHERE e.art = 'A' AND date_format(datum, \"%Y%m%d\") BETWEEN date_format(CURDATE(), \"%Y%m01\") and CURDATE() -- AND typ = 'V'
 GROUP BY vorgang;";
@@ -57,6 +57,7 @@ else {
     while (!$rs->EOF) {
         $data[$i]['summe'] = $rs->fields['summe'] * (-1);
         $data[$i]['vorgang'] = $rs->fields['vorgang'];
+        $data[$i]['count'] = $rs->fields['count'];
         $i++;
 
 
