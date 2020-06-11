@@ -156,6 +156,7 @@ function chartGesamtMonatKreditKarten(auswahl)
         // category
         var categoryAxis = chart.categoryAxis;
         categoryAxis.gridPosition = "start";
+        categoryAxis.title = "monat";
         // value
         // in case you don't want to change default settings of value axis,
         // you don't need to create it, as one value axis is created automatically.
@@ -164,27 +165,22 @@ function chartGesamtMonatKreditKarten(auswahl)
         var graph1 = new AmCharts.AmGraph();
         graph1.type = "column";
         graph1.lineColor = "#5475d3";
-        graph1.title = "Ay";
+        graph1.title = "monat";
         graph1.valueField = "gesamt";
         graph1.lineAlpha = 0;
         graph1.fillAlphas = 0.85;
+        graph1.balloonText = "<b>[[value]]</b>: ([[category]])";
         chart.addGraph(graph1);
-        // line
-        var graph2 = new AmCharts.AmGraph();
-        graph2.type = "line";
-        graph2.title = "Dönem Borcu";
-        graph2.valueField = "gesamt";
-        graph2.lineThickness = 2;
-        graph2.bullet = "round";
-        chart.addGraph(graph2);
 
-        var graph3 = new AmCharts.AmGraph();
+
+        var graph2 = new AmCharts.AmGraph();
         graph2.type = "line";
         graph2.title = "Ödeme";
         graph2.valueField = "zahlung";
         graph2.lineThickness = 2;
         graph2.bullet = "round";
-        chart.addGraph(graph3);
+        graph2.balloonText = "<b>[[value]]</b>: ([[category]])";
+        chart.addGraph(graph2);
         // LEGEND                
         //  var legend = new AmCharts.AmLegend();
         // chart.addLegend(legend);

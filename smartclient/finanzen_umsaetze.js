@@ -92,7 +92,9 @@ function uploadDocUmsaetze(_this)
             } else
             {
                 AusgabenListe.invalidateCache();
-                isc.say(response);
+//                isc.say(response);
+                htmlPaneDropZoneUmsaetzeResluts.setContents(response);
+                wdUmsaetzeUploadResults.show();
             }
         } catch (err) {
             isc.say(err.message);
@@ -487,6 +489,39 @@ isc.DataSource.create({
  * ******************** GoTo: DropZone *************************
  * -------------------------------------------------------------
  */
+
+
+
+isc.HTMLPane.create({
+    width: "100%",
+    height: "100%",
+    margin: 1,
+    ID: "htmlPaneDropZoneUmsaetzeResluts",
+//    backgroundColor: "grey",
+    styleName: "exampleTextBlock",
+    contents: ''
+});
+
+currentIcon = "famfam/sum.png";
+isc.Window.create({
+    ID: "wdUmsaetzeUploadResults",
+    width: 700,
+    height: 600,
+    title: "Upload-Ergebnisse",
+    //     autoSize: true,
+    autoCenter: true,
+    headerIconDefaults: {width: 16, height: 16, src: currentIcon},
+    showFooter: false,
+    showMinimizeButton: false,
+    showCloseButton: true,
+    canDragReposition: true,
+    canDragResize: true,
+    showShadow: false,
+    showModalMask: false,
+    modalMaskOpacity: 10,
+    isModal: false,
+    items: [htmlPaneDropZoneUmsaetzeResluts]
+});
 
 isc.HTMLPane.create({
     width: "100%",

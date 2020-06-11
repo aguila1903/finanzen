@@ -404,9 +404,9 @@ isc.Window.create({
     canDragReposition: true,
     canDragResize: true,
     showShadow: false,
-    showModalMask: false,
+    showModalMask: true,
     modalMaskOpacity: 10,
-    isModal: false,
+    isModal: true,
     items: [dfStammKontenEdit, isc.LayoutSpacer.create({
             height: 20
         }), HLayoutStammKontenEdit]});

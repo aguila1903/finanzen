@@ -68,7 +68,7 @@ if (isset($_FILES['file'])) {
 //    $fileName = "createUsers.csv";
 }
 if (defined("PATH_CSV")) {
-    $path =  PATH_CSV;
+    $path = PATH_CSV;
 } else {
     $result = json_encode('Error: CSV-Pfad nicht definiert');
     print $result;
@@ -76,7 +76,7 @@ if (defined("PATH_CSV")) {
 }
 
 
-$path2 = str_replace("/", "\\",$path . "umsaetze/");
+$path2 = str_replace("/", "\\", $path . "umsaetze/");
 
 if (is_dir($path2) != 1) {
     mkdir($path2, 0775, true);
@@ -94,6 +94,10 @@ if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
     $split = explode("\n", $file_repl);
     $uplStatus = "";
     $ii = 1;
+    $tableStart = "<table>";
+    $tableEnd = "</table>";
+    $tableBody = "";
+    $tableHeader = "<tr><th>Nr.</th><th>Hinzugefügte Einträge</th><th>Nicht hinzugefügte Einträge (doppelt)</th></tr>";
     $count = count($split) - 1;
     while ($ii <= $count) {
 
@@ -140,15 +144,13 @@ if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
                 }
 
                 $i = 0;
-
                 while (!$rs->EOF) {
                     $ergebnis = $rs->fields['Ergebnis'];
-                    $ergText = ($ergebnis == "1") ? "Eintrag hinzugefügt: " . $rs->fields['ErgText'] : "Eintrag nicht hinzugefügt: " . $rs->fields['ErgText'];
-                    $uplStatus .= "$ii) $ergText  <br />";
+                    $tableBody .= ($ergebnis == "1") ? "<tr><td>$ii</td><td>" . $rs->fields['ErgText'] . "</td><td></td></tr>" : "<tr><td>$ii</td><td></td><td>" . $rs->fields['ErgText'] . "</td></tr>";
                     $i++;
 
                     $rs->MoveNext();
-                }
+                }               
 
                 $rs->Close();
             }
@@ -156,8 +158,8 @@ if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
 
         $ii++;
     }
-
-    $result = json_encode(($fileName) . ':<br />' . $uplStatus);
+    $uplStatus .= $tableStart . $tableHeader . $tableBody . $tableEnd;
+    $result = json_encode($uplStatus);
 
     print ($result);
     return;

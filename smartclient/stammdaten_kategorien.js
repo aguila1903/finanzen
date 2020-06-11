@@ -356,9 +356,9 @@ isc.Window.create({
     canDragReposition: true,
     canDragResize: true,
     showShadow: false,
-    showModalMask: false,
+    showModalMask: true,
     modalMaskOpacity: 10,
-    isModal: false,
+    isModal: true,
     items: [dfStammKategorienAdd, isc.LayoutSpacer.create({
             height: 20
         }), HLayoutStmmKategorienAdd]});
@@ -623,9 +623,9 @@ isc.Window.create({
     canDragReposition: true,
     canDragResize: true,
     showShadow: false,
-    showModalMask: false,
+    showModalMask: true,
     modalMaskOpacity: 10,
-    isModal: false,
+    isModal: true,
     items: [dfStammKategorienEdit, isc.LayoutSpacer.create({
             height: 20
         }), HLayoutStmmKategorienEdit]});
