@@ -146,7 +146,7 @@ else {
         $data[$i]["rate_rest"] = (int) $rs->fields["rate_rest"];
         //  $data[$i]["betrag_gezahlt"] = number_format($rs->fields["betrag_gezahlt"], 2, ',', '.');
         $data[$i]["betrag_gezahlt"] = number_format($rs->fields["betrag_gezahlt"], 2, '.', '');
-        $data[$i]["rate_rest"] = number_format($rs->fields["rate_rest"], 2, '.', '');
+        $data[$i]["rest_betrag"] = number_format($rs->fields["rest_betrag"], 2, '.', '');
         //   $data[$i]["gesamt_betrag"] = number_format($rs->fields["gesamt_betrag"], 2, ',', '.');
         $data[$i]["gesamt_betrag"] = number_format($rs->fields["gesamt_betrag"], 2, '.', '');
         $data[$i]["comment"] = ($rs->fields["comment"]);

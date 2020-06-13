@@ -65,6 +65,10 @@ userFontColor = "000000";
 anzahlLabelColor = "#D91D15";
 suchFelderDropDownColor = "#000000";
 gridComponentsLabelColor = "#005491";
+fixKosten = "#FFB6C1";
+varKosten = "#F9E7E7";
+fixEinnahme = "#B3DBD4";
+varEinnahme = "#C1FFC1";
 // Schriftgrößen
 titleLableFontSize = "30px";
 keinBildFontSize = "19px";
@@ -119,6 +123,8 @@ pages = {
             amChartsDashboardEinKat();
             amChartsDashboardVorgang();
             amChartsDashboardHerkunft();
+            amChartsDashboardEinAusgaben("A", htmlPaneDashboardEinAusgabenA, "divGrafikDashboardEinAusgabenA", "Ausgaben seit 2020 (bis einschl: "+_Heute_Ger+")", fixKosten, varKosten);
+            amChartsDashboardEinAusgaben("E", htmlPaneDashboardEinAusgabenE, "divGrafikDashboardEinAusgabenE", "Einnahmen seit 2020 (bis einschl: "+_Heute_Ger+")", fixEinnahme, varEinnahme);
         },
         cat: "Dashboard",
         treenode: {
@@ -138,7 +144,9 @@ chartClean = {
     4: "htmlPaneDashboardEinKat",
     5: "htmlPaneDashboardAusgKat",
     6: "htmlPaneDashboardVorgang",
-    7: "htmlPaneDashboardHerkunft"
+    7: "htmlPaneDashboardEinAusgabenA",
+    7: "htmlPaneDashboardEinAusgabenE",
+    8: "htmlPaneDashboardHerkunft"
 };
 
 
@@ -302,28 +310,28 @@ function amChartsDashboardKosten()
 
         // GRAPHS
         // first graphKosten     
-        graphKosten = new AmCharts.AmGraph();
-        graphKosten.title = "Fixkosten";
-        graphKosten.labelText = "[[value]]";
-        graphKosten.valueField = "fixkosten";
-        graphKosten.type = "column";
-        graphKosten.lineAlpha = 0;
-        graphKosten.fillAlphas = 1;
-        graphKosten.lineColor = "#B3DBD4";
-        graphKosten.balloonText = "[[title]]: [[value]]";
-        chartKosten.addGraph(graphKosten);
+        graphKostenFix = new AmCharts.AmGraph();
+        graphKostenFix.title = "Fixkosten";
+        graphKostenFix.labelText = "[[value]]";
+        graphKostenFix.valueField = "fixkosten";
+        graphKostenFix.type = "column";
+        graphKostenFix.lineAlpha = 0;
+        graphKostenFix.fillAlphas = 1;
+        graphKostenFix.lineColor = fixKosten;
+        graphKostenFix.balloonText = "[[title]]: [[value]]";
+        chartKosten.addGraph(graphKostenFix);
 
         // second graphKosten                            
-        graphKosten = new AmCharts.AmGraph();
-        graphKosten.title = "Variable Kosten";
-        graphKosten.labelText = "[[value]]";
-        graphKosten.valueField = "variable_kosten";
-        graphKosten.type = "column";
-        graphKosten.lineAlpha = 0;
-        graphKosten.fillAlphas = 1;
-        graphKosten.lineColor = "#F9E7E7";
-        graphKosten.balloonText = "[[title]]: [[value]]";
-        chartKosten.addGraph(graphKosten);
+        graphKostenVar = new AmCharts.AmGraph();
+        graphKostenVar.title = "Variable Kosten";
+        graphKostenVar.labelText = "[[value]]";
+        graphKostenVar.valueField = "variable_kosten";
+        graphKostenVar.type = "column";
+        graphKostenVar.lineAlpha = 0;
+        graphKostenVar.fillAlphas = 1;
+        graphKostenVar.lineColor = varKosten;
+        graphKostenVar.balloonText = "[[title]]: [[value]]";
+        chartKosten.addGraph(graphKostenVar);
 
 
         // LEGEND                  
@@ -383,28 +391,28 @@ function amChartsDashboardEinnahmen()
 
         // GRAPHS
         // first graphEinnahmen     
-        graphEinnahmen = new AmCharts.AmGraph();
-        graphEinnahmen.title = "Fix-Einnahmen";
-        graphEinnahmen.labelText = "[[value]]";
-        graphEinnahmen.valueField = "fixeinnahmen";
-        graphEinnahmen.type = "column";
-        graphEinnahmen.lineAlpha = 0;
-        graphEinnahmen.fillAlphas = 1;
-        graphEinnahmen.lineColor = "#B3DBD4";
-        graphEinnahmen.balloonText = "[[title]]: [[value]]";
-        chartEinnahmen.addGraph(graphEinnahmen);
+        graphEinnahmenFix = new AmCharts.AmGraph();
+        graphEinnahmenFix.title = "Fix-Einnahmen";
+        graphEinnahmenFix.labelText = "[[value]]";
+        graphEinnahmenFix.valueField = "fixeinnahmen";
+        graphEinnahmenFix.type = "column";
+        graphEinnahmenFix.lineAlpha = 0;
+        graphEinnahmenFix.fillAlphas = 1;
+        graphEinnahmenFix.lineColor = fixEinnahme;
+        graphEinnahmenFix.balloonText = "[[title]]: [[value]]";
+        chartEinnahmen.addGraph(graphEinnahmenFix);
 
         // second graphEinnahmen                            
-        graphEinnahmen = new AmCharts.AmGraph();
-        graphEinnahmen.title = "Variable Einnahmen";
-        graphEinnahmen.labelText = "[[value]]";
-        graphEinnahmen.valueField = "variable_einnahmen";
-        graphEinnahmen.type = "column";
-        graphEinnahmen.lineAlpha = 0;
-        graphEinnahmen.fillAlphas = 1;
-        graphEinnahmen.lineColor = "#F9E7E7";
-        graphEinnahmen.balloonText = "[[title]]: [[value]]";
-        chartEinnahmen.addGraph(graphEinnahmen);
+        graphEinnahmenVar = new AmCharts.AmGraph();
+        graphEinnahmenVar.title = "Variable Einnahmen";
+        graphEinnahmenVar.labelText = "[[value]]";
+        graphEinnahmenVar.valueField = "variable_einnahmen";
+        graphEinnahmenVar.type = "column";
+        graphEinnahmenVar.lineAlpha = 0;
+        graphEinnahmenVar.fillAlphas = 1;
+        graphEinnahmenVar.lineColor = varEinnahme;
+        graphEinnahmenVar.balloonText = "[[title]]: [[value]]";
+        chartEinnahmen.addGraph(graphEinnahmenVar);
 
 
         // LEGEND                  
@@ -440,12 +448,13 @@ var amChartsDashboardAusgKat = function ()
         // SERIAL CHART
         chartAusgKat = new AmCharts.AmPieChart();
         chartAusgKat.dataProvider = chartData;
-        chartAusgKat.titles = [{"text": "Ausgaben nach Kategorien",
+        chartAusgKat.titles = [{"text": "Ausgaben nach Kategorien (Stand: "+_Heute_Ger+")",
                 "size": 20,
                 "color": "#808080",
                 "bold": true
             }];
         chartAusgKat.titleField = "kategorie";
+        chartAusgKat.colorField = "color";
         chartAusgKat.valueField = "summe";
         chartAusgKat.outlineColor = "#FFFFFF";
         chartAusgKat.outlineAlpha = 0.8;
@@ -486,12 +495,13 @@ var amChartsDashboardEinKat = function ()
         chartEinKat = new AmCharts.AmPieChart();
         chartEinKat.dataProvider = chartData;
         chartEinKat.amLink = "";
-        chartEinKat.titles = [{"text": "Einnahmen nach Kategorien",
+        chartEinKat.titles = [{"text": "Einnahmen nach Kategorien (Stand: "+_Heute_Ger+")",
                 "size": 20,
                 "color": "#808080",
                 "bold": true
             }];
         chartEinKat.titleField = "kategorie";
+        chartEinKat.colorField = "color";
         chartEinKat.valueField = "summe";
         chartEinKat.outlineColor = "#FFFFFF";
         chartEinKat.outlineAlpha = 0.8;
@@ -532,12 +542,13 @@ var amChartsDashboardVorgang = function ()
         chartVorgang = new AmCharts.AmPieChart();
         chartVorgang.dataProvider = chartData;
         chartVorgang.amLink = "";
-        chartVorgang.titles = [{"text": "Ausgaben nach Vorgängen",
+        chartVorgang.titles = [{"text": "Ausgaben nach Vorgängen (Stand: "+_Heute_Ger+")",
                 "size": 20,
                 "color": "#808080",
                 "bold": true
             }];
         chartVorgang.titleField = "vorgang";
+        chartVorgang.colorField = "color";
         chartVorgang.valueField = "summe";
         chartVorgang.outlineColor = "#FFFFFF";
         chartVorgang.outlineAlpha = 0.8;
@@ -577,12 +588,13 @@ var amChartsDashboardHerkunft = function ()
         chartHerkunft = new AmCharts.AmPieChart();
         chartHerkunft.dataProvider = chartData;
         chartHerkunft.amLink = "";
-        chartHerkunft.titles = [{"text": "Ausgaben nach Herkunft",
+        chartHerkunft.titles = [{"text": "Ausgaben nach Herkunft (Stand: "+_Heute_Ger+")",
                 "size": 20,
                 "color": "#808080",
                 "bold": true
             }];
         chartHerkunft.titleField = "herkunft";
+        chartHerkunft.colorField = "color";
         chartHerkunft.valueField = "summe";
         chartHerkunft.outlineColor = "#FFFFFF";
         chartHerkunft.outlineAlpha = 0.8;
@@ -606,6 +618,90 @@ var amChartsDashboardHerkunft = function ()
         useSimpleHttp: true,
         params: {count: ++counterDashboard}
     }); // Ende RPC
+};
+
+
+var amChartsDashboardEinAusgaben = function (art_, htmlPane, div_, title_, colFix, colVar)
+{
+
+    htmlPane.setContents("");
+    htmlPane.setContents("<div id='"+div_+"' style='width: 100%; height: 90%; padding-top: 10px;'></div>");
+    RPCManager.send("", function (rpcResponse, data, rpcRequest)
+    {
+        _data = isc.JSON.decode(data);        
+        var chartData = _data.response.data;
+
+        // SERIAL CHART
+        chartAusg = new AmCharts.AmSerialChart();
+        chartAusg.dataProvider = chartData;
+        chartAusg.categoryField = "stand";
+        chartAusg.plotAreaBorderAlpha = 0.2;
+        // SERIAL CHART
+        chartAusg.pathToImages = "js/images/";
+        chartAusg.titles = [{"text": title_,
+                "size": 20,
+                "color": "#808080",
+                "bold": true
+            }];
+
+        // AXES
+        // category
+        var categoryAxis = chartAusg.categoryAxis;
+        categoryAxis.gridAlpha = 0.1;
+        categoryAxis.axisAlpha = 0;
+        categoryAxis.gridPosition = "start";
+
+        // value
+        var valueAxis = new AmCharts.ValueAxis();
+        valueAxis.stackType = "regular";
+        valueAxis.gridAlpha = 0.1;
+        valueAxis.axisAlpha = 0;
+        chartAusg.addValueAxis(valueAxis);
+
+        // GRAPHS
+        // Saldo    
+        graph = new AmCharts.AmGraph();
+        graph.title = "Fix";
+        graph.labelText = "[[value]]";
+        graph.valueField = "fix";
+        graph.type = "column";
+        graph.lineAlpha = 0;
+        graph.fillAlphas = 1;
+        graph.lineColor = colFix;
+        graph.balloonText = "[[title]]: [[value]]";
+        chartAusg.addGraph(graph);
+
+        // Sparbetrag                           
+        graph = new AmCharts.AmGraph();
+        graph.title = "Variabel";
+        graph.labelText = "[[value]]";
+        graph.valueField = "variabel";
+        graph.type = "column";
+        graph.lineAlpha = 0;
+        graph.fillAlphas = 1;
+        graph.lineColor = colVar;
+        graph.balloonText = "[[title]]: [[value]]";
+        chartAusg.addGraph(graph);
+        chartAusg.startDuration = 1;
+        chartAusg.startEffect = "bounce";
+
+
+        // LEGEND                  
+        var legend = new AmCharts.AmLegend();
+        legend.borderAlpha = 0.2;
+        legend.horizontalGap = 10;
+        chartAusg.addLegend(legend);
+
+        // WRITE
+        chartAusg.write(div_);
+    }, {
+        actionURL: "api/ds/dashboard_einAusgaben.php",
+        httpMethod: "GET",
+        contentType: "application/x-www-form-urlencoded",
+        useSimpleHttp: true,
+        params: {count: ++counterDashboard,
+        art: art_}
+    }); // Ende RPC 
 };
 
 function clearCharts(_chartId)
@@ -1597,6 +1693,22 @@ isc.HTMLPane.create({
     styleName: "exampleTextBlock",
     contents: ""});
 
+isc.HTMLPane.create({
+    width: 900,
+    height: 600,
+    padding: 5,
+    ID: "htmlPaneDashboardEinAusgabenA",
+    styleName: "exampleTextBlock",
+    contents: ""});
+
+isc.HTMLPane.create({
+    width: 900,
+    height: 600,
+    padding: 5,
+    ID: "htmlPaneDashboardEinAusgabenE",
+    styleName: "exampleTextBlock",
+    contents: ""});
+
 
 
 /*
@@ -1645,12 +1757,19 @@ isc.HLayout.create({
     members: [htmlPaneDashboardVorgang, htmlPaneDashboardHerkunft]
 });
 
+isc.HLayout.create({
+    ID: "HLayoutDashboardEinAusgaben",
+    height: "100%",
+    width: "100%",
+    members: [htmlPaneDashboardEinAusgabenA, htmlPaneDashboardEinAusgabenE]
+});
+
 isc.VLayout.create({
     ID: "VLayoutDashboardGraphics",
     height: "100%",
     overflow: "scroll",
     width: "100%",
-    members: [HLayoutDashboard, HLayoutDashboardPie, HLayoutDashboardHerkunftVorgangPie]
+    members: [HLayoutDashboard, HLayoutDashboardPie, HLayoutDashboardHerkunftVorgangPie, HLayoutDashboardEinAusgaben]
 });
 
 isc.VLayout.create({

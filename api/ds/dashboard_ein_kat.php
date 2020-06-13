@@ -21,6 +21,25 @@ $dbSyb->Connect(DB_HOST, DB_USER, DB_PW, DB_NAME);  //=>>> Verbindungsaufbau mit
 
 $out = [];
 $data = [];
+$colors = ["#AFEEEE",
+    "#6495ED",
+    "#48D1CC",
+    "#32CD32",
+    "#F08080",
+    "#FFB6C1",
+    "#B4EEB4",
+    "#CDAF95",
+    "#836FFF",
+    "#63B8FF",
+    "#B0C4DE",
+    "#48D1CC",
+    "#87CEFF",
+    "#87CEFF",
+    "#BFEFFF",
+    "#66CDAA",
+    "#AB82FF",
+    "#CAFF70",
+    "#87CEEB"];
 
 if (!$dbSyb->IsConnected()) {
 
@@ -51,11 +70,12 @@ if (!$rs) {
 else {
 
     $i = 0;
-    while (!$rs->EOF) {  
+    while (!$rs->EOF) {
         $data[$i]['summe'] = $rs->fields['summe'];
         $data[$i]['kategorie'] = $rs->fields['bezeichnung'];
+        $data[$i]['color'] = $colors[$i];
         $i++;
-     
+
 
         // den n�chsten Datensatz lesen
         $rs->MoveNext();

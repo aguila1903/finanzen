@@ -21,6 +21,25 @@ $dbSyb->Connect(DB_HOST, DB_USER, DB_PW, DB_NAME);  //=>>> Verbindungsaufbau mit
 
 $out = [];
 $data = [];
+$colors = ["#6A5ACD",
+    "#DAA520",
+    "#BC8F8F",
+    "#CD5C5C",
+    "#FA8072",
+    "#E9967A",
+    "#DB7093",
+    "#EE82EE",
+    "#BA55D3",
+    "#FFB90F",
+    "#CD5555",
+    "#FF4040",
+    "#EE9A00",
+    "#FF6347",
+    "#CD0000",
+    "#FF82AB",
+    "#EE7AE9",
+    "#BF3EFF",
+    "#9F79EE"];
 
 if (!$dbSyb->IsConnected()) {
 
@@ -58,6 +77,7 @@ else {
         $data[$i]['summe'] = $rs->fields['summe'] * (-1);
         $data[$i]['vorgang'] = $rs->fields['vorgang'];
         $data[$i]['count'] = $rs->fields['count'];
+        $data[$i]['color'] = $colors[$i];
         $i++;
 
 
