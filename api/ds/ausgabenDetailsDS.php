@@ -96,10 +96,18 @@ else {
             $id = 1;  // Ausgabe
             $data[$i]["_hilite"] = $id;
         }
-        if ($data[$i]["einausgaben_id"] > 0) {
+        if (intval($data[$i]["einausgaben_id"]) > 0) {
             $data[$i]["ref"] = "tick";
-        }else{
-            $data[$i]["ref"] = "error";
+        } else {
+            if (intval($data[$i]["einausgaben_id"]) == -99) { // Fixkosten
+                $data[$i]["ref"] = "thumb_up";
+            } elseif (intval($data[$i]["einausgaben_id"]) == -999) { // Wird nicht kategorisiert
+                $data[$i]["ref"] = "exclamation";
+            } elseif (intval($data[$i]["einausgaben_id"]) == -9999) { // Unbekannt, muss noch geprüft werden
+                $data[$i]["ref"] = "question";
+            } else {
+                $data[$i]["ref"] = "error";
+            }
         }
 
         $i++;

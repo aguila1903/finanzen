@@ -762,10 +762,10 @@ addNode("VLayoutKredite", {
     cat: "Finanzen",
     onOpen: function ()
     {
+        clearCharts('');
         amChartsKredite();
         lgKredite.contextMenu = menuKredite;
-        htmlPaneDropZoneKredite.hide();
-        clearCharts('PaneKredite');
+        htmlPaneDropZoneKredite.hide();        
     },
     treenode: {
         Name: "VLayoutKredite",

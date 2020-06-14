@@ -159,6 +159,51 @@ function initDropZoneUmsaetze()
         file.previewElement.appendChild(removeButtonUmsaetze);
     });
 }
+;
+
+function setUmsatzStatus(status_)
+{
+    id_al = AusgabenListe.getSelectedRecord().ID;
+    id_ald = AusgabenListeDetails.getSelectedRecord().ID;
+    RPCManager.send("", function (rpcResponse, data, rpcRequest)
+    {
+        var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
+
+        if (_data.response.status === 0)
+        {  // Status 0 bedeutet Keine Fehler
+
+//                        AusgabenListeDetails.invalidateCache();
+            AusgabenListe.invalidateCache();
+            findRecord(AusgabenListe, id_al);
+            isc.Timer.setTimeout(function ()
+            {
+                findRecord(AusgabenListeDetails, id_ald);
+            }, 500);
+
+        } else
+        { // Wenn die Validierungen Fehler aufweisen dann:
+
+            dfKategorien.setErrors(_data.response.errors, true);
+            var _errors = dfKategorien.getErrors();
+            for (var i in _errors)
+            {
+                isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>");
+            }
+
+        }
+    }, {// Übergabe der Parameter
+        actionURL: "api/umsatz_kategorie_status.php",
+        httpMethod: "POST",
+        contentType: "application/x-www-form-urlencoded",
+        useSimpleHttp: true,
+        params: {
+            ID: AusgabenListeDetails.getSelectedRecord().ID,
+            status: status_
+        }
+
+    }); //Ende RPC
+}
+;
 
 /*
  * ************************ GoTo: DataSources ************************
@@ -796,6 +841,13 @@ isc.ListGrid.create({
     {
         wdUmsaetzeEdit.show();
         dfUmsaetzeEdit.editRecord(record);
+        if (record.betrag.substr(0, 1) == "-")
+        {
+            setValue2Field(dfKategorien, 'art', "A");
+        } else
+        {
+            setValue2Field(dfKategorien, 'art', "E");
+        }
     }, dataChanged: function ()
     {
         isc.Timer.setTimeout("AusgabenListeDetails.getSum()", 500);
@@ -1427,6 +1479,7 @@ isc.ToolStripButton.create({
     count: 1,
     action: function ()
     {
+        id_al = AusgabenListe.getSelectedRecord().ID;
         if (AusgabenListeDetails.getSelection().length == 1)
         {
             isc.ask("Wollen Sie wirklich den ausgewählten Datensatz löschen?", function (value)
@@ -1442,6 +1495,7 @@ isc.ToolStripButton.create({
 
                             isc.say("Datensatz wurde erfolgreich gelöscht.");
                             AusgabenListe.invalidateCache();
+                            findRecord(AusgabenListe, id_al);
 
                         } else
                         { // Wenn die Validierungen Fehler aufweisen dann:
@@ -1757,7 +1811,7 @@ isc.DynamicForm.create({
                     hoverDelay: 700,
                     click: function ()
                     {
-                        dfEinAusgaben.getField("zahlungsmittel_id").clearValue();
+                        dfKategorien.getField("zahlungsmittel_id").clearValue();
                         changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
                     }
                 }]
@@ -1976,6 +2030,7 @@ isc.IButton.create({
 
     } // Ende Click
 });
+
 isc.IButton.create({
     ID: "btnResetKategorien",
     type: "button",
@@ -1995,7 +2050,9 @@ isc.IButton.create({
         var record = AusgabenListeDetails.getSelectedRecord();
         dfKategorien.editRecord(record);
 
-    }});
+    }
+});
+
 isc.HLayout.create({
     ID: "HLayoutKategorien",
     height: 30,
@@ -2049,6 +2106,14 @@ isc.ToolStripButton.create({
             dfKategorien.getField("detail").setDisabled(true);
             dfKategorien.getField("dauer").hide();
             setValue2Field(dfKategorien, "detail", "N");
+
+            if (AusgabenListeDetails.getSelectedRecord().betrag.substr(0, 1) == "-")
+            {
+                setValue2Field(dfKategorien, 'art', "A");
+            } else
+            {
+                setValue2Field(dfKategorien, 'art', "E");
+            }
         } else
         {
             isc.say("Bitte erst einen Datensatz wählen");
@@ -2126,7 +2191,22 @@ isc.Menu.create({
             {
                 tsbKategorien.action();
             }
-        }
+        },
+        {isSeparator: true},
+        {title: "Status", icon: "icons/16/folder_document.png", submenu: [
+                {title: "Fix", icon: "web/16/thumb_up.png", click: function ()
+                    {
+                        setUmsatzStatus(-99);
+                    }},
+                {title: "Wird noch geprüft", icon: "web/16/question.png", click: function ()
+                    {
+                        setUmsatzStatus(-9999);
+                    }},
+                {title: "Wird nicht kategorisiert", icon: "web/16/exclamation.png", click: function ()
+                    {
+                        setUmsatzStatus(-999);
+                    }}
+            ]}
     ]
 });
 

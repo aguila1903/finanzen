@@ -2180,8 +2180,8 @@ addNode("VLayoutKreditKarten", {
         lgKreditKarten.contextMenu = menuKreditKarten;
         htmlPaneDropZoneKreditKarten.hide();
         setValue2Field(dfMonateKreditKarten, "monat", dfKreditKartenEdit.getField("monat").getValue());
+        clearCharts('');
         isc.Timer.setTimeout("chartMonatVorMonatkKreditKarten()", 500);
-        clearCharts('htmlPaneVergleichsGrafikKreditKarten');
         getLiveCurrency();
     },
     treenode: {

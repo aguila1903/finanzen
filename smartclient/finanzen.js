@@ -115,7 +115,7 @@ pages = {
         "name": "VLayoutDashboard",
         "onOpen": function ()
         {
-            clearCharts("htmlPaneDashboardKosten");
+            clearCharts("");
             amChartsDashboardKosten();
             amChartsFinanzStatus();
             amChartsDashboardEinnahmen();
@@ -145,8 +145,8 @@ chartClean = {
     5: "htmlPaneDashboardAusgKat",
     6: "htmlPaneDashboardVorgang",
     7: "htmlPaneDashboardEinAusgabenA",
-    7: "htmlPaneDashboardEinAusgabenE",
-    8: "htmlPaneDashboardHerkunft"
+    8: "htmlPaneDashboardEinAusgabenE",
+    9: "htmlPaneDashboardHerkunft"
 };
 
 
