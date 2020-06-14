@@ -1328,7 +1328,12 @@ isc.IButton.create({
     {
         if (dfUmsaetzeAdd.validate())
         {
-            id_al = AusgabenListe.getSelectedRecord().ID;
+            if (AusgabenListe.getTotalRows() > 0)
+            {
+                id_al = AusgabenListe.getSelectedRecord().ID;
+            }else{
+                id_al = 0;
+            }
             RPCManager.send("", function (rpcResponse, data, rpcRequest)
             {
                 var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
