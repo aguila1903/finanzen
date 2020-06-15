@@ -32,7 +32,17 @@ if (!$dbSyb->IsConnected()) {
 
 $dbSyb->debug = false;
 
+if (isset($_REQUEST["auswahl"])) {
+    $ausw = $_REQUEST["auswahl"];
+} else {
+    $ausw = "A";
+}
 
+if ($ausw == "A") {
+    $where = " AND DATE_FORMAT(curdate(),\"%Y%m%d\") <= DATE_FORMAT(enddatum,\"%Y%m%d\") ";
+} else {
+    $where = "";
+}
 
 $querySQL = " SELECT 
     vorgang,
@@ -43,7 +53,7 @@ FROM
     einausgaben a
 WHERE
     typ = 'F' AND detail = 'J'
-        AND datum <= CURDATE();";
+        $where;";
 
 
 $rs = $dbSyb->Execute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?

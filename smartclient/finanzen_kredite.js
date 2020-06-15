@@ -87,7 +87,8 @@ function amChartsKredite()
         httpMethod: "GET",
         contentType: "application/x-www-form-urlencoded",
         useSimpleHttp: true,
-        params: {count: dsCounterKredite.monCnt}
+        params: {count: dsCounterKredite.monCnt,
+            auswahl: dfKrediteAuswahl.getField("auswahl").getValue()}
     }); // Ende RPC
 }
 ;
@@ -111,7 +112,8 @@ function uploadDocKredite(_this, id)
                 }
             } else
             {
-                lgKredite.invalidateCache();
+//                lgKredite.invalidateCache();
+                lgKredite.fetchData({auswahl: dfKrediteAuswahl.getField("auswahl").getValue()});
                 isc.say(response, function (value)
                 {
                     if (value)
@@ -312,6 +314,36 @@ Dropzone.options.dropZoneKredite = {
  * ****************** ENDE DropZone *****************************
  * --------------------------------------------------------------
  */
+
+
+/*
+ * **************************** DynaForm ***************************************
+ * =============================================================================
+ */
+isc.DynamicForm.create({
+    ID: "dfKrediteAuswahl",
+    monCnt: 0,
+    width: 300,
+    height: 10,
+    margin: 0,
+    numCols: 2,
+    fields: [{
+            name: "auswahl",
+            title: "Anzeige der Daten",
+            valueMap: {"A": "aktive Vorgänge", "ALL": "alle Vorgänge"},
+            defaultValue: "A",
+            type: "radioGroup",
+            redrawOnChange: true,
+            vertical: false,
+            changed: function (form, item, value)
+            {
+                lgKredite.fetchData({auswahl: value});
+                amChartsKredite();
+            }
+        }
+    ]
+});
+
 
 /*
  * GoTo: ************************ Listen ***************************************
@@ -537,7 +569,8 @@ isc.ToolStripButton.create({
     count: 1,
     action: function ()
     {
-        lgKredite.invalidateCache();
+//        lgKredite.invalidateCache();
+        lgKredite.fetchData({auswahl: dfKrediteAuswahl.getField("auswahl").getValue()});
         amChartsKredite();
     },
     prompt: "Daten neu laden",
@@ -600,7 +633,9 @@ isc.ToolStripButton.create({
                         {  // Status 0 bedeutet Keine Fehler
 
                             isc.say("Dokument wurde erfolgreich gelöscht.");
-                            lgKredite.invalidateCache();
+//                            lgKredite.invalidateCache();
+                            lgKredite.fetchData({auswahl: dfKrediteAuswahl.getField("auswahl").getValue()});
+                            amChartsKredite();
 
                         } else
                         { // Wenn die Validierungen Fehler aufweisen dann:                            
@@ -737,7 +772,10 @@ isc.ToolStrip.create({
     width: "100%",
     backgroundImage: "backgrounds/leaves.jpg",
     height: 40,
-    members: [tsbKrediteRefresh, isc.LayoutSpacer.create({width: 10}), tsbUploadDocsKredite, isc.LayoutSpacer.create({width: 10}), tsbKrediteDeleteDoc, isc.LayoutSpacer.create({width: "*"}),
+    members: [tsbKrediteRefresh, isc.LayoutSpacer.create({width: 10}),
+        tsbUploadDocsKredite, isc.LayoutSpacer.create({width: 10}),
+        tsbKrediteDeleteDoc, isc.LayoutSpacer.create({width: 10}),
+        dfKrediteAuswahl, isc.LayoutSpacer.create({width: "*"}),
         lblKredite, isc.LayoutSpacer.create({width: 5})]
 });
 
@@ -765,7 +803,7 @@ addNode("VLayoutKredite", {
         clearCharts('');
         amChartsKredite();
         lgKredite.contextMenu = menuKredite;
-        htmlPaneDropZoneKredite.hide();        
+        htmlPaneDropZoneKredite.hide();
     },
     treenode: {
         Name: "VLayoutKredite",
