@@ -205,8 +205,14 @@ if (isset($_REQUEST["f"])) {
     $f = "";
 }
 
-if ($f != "sum") {
-    $querySQL = "SELECT e.ID, e.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang, e.betrag, e.kategorie_id, e.interval,   
+if (isset($_REQUEST["auswahl"])) {
+    $ausw = $_REQUEST["auswahl"];
+} else {
+    $ausw = "B";
+}
+
+
+$queryOrig = "SELECT e.ID, e.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang, e.betrag, e.kategorie_id, e.interval,   
   case when e.interval = 'Y' then 'jährlich' when e.interval = 'Q' then 'quartalsweise' when e.interval = 'M' then 'monatlich' when ifnull(e.interval,'') = '' or e.interval = 'E'  then 'einmalig' END AS int_bez,
   case when e.typ = 'V' then 'Variabel' when e.typ = 'F' then 'Fix' ELSE '' END  typ_bez,
   case when e.art = 'A' then 'Ausgaben'  when e.art = 'E' then 'Einnahmen' ELSE '' END  art_bez,
@@ -216,20 +222,21 @@ if ($f != "sum") {
   JOIN konten k ON e.kontonr=k.kontonr
   LEFT JOIN zahlungsmittel z ON z.ID = e.zahlungsmittel_id 
   JOIN kategorien ka ON e.kategorie_id=ka.ID Where e.ID > -1 "
-            . $andKonto
-            . $andDatum
-            . $andEndDatum
-            . $andArt
-            . $andTyp
-            . $andVorgang
-            . $andHerkunft
-            . $andInterval
-            . $andZeitraum
-            . $andKategorie
-            . $andJahr
-            . $andZahlungsmittel
-            . " Union " // Fixkosten
-            . " SELECT e.ID, dt.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang, e.betrag, e.kategorie_id, e.interval,   
+        . $andKonto
+        . $andDatum
+        . $andEndDatum
+        . $andArt
+        . $andTyp
+        . $andVorgang
+        . $andHerkunft
+        . $andInterval
+        . $andZeitraum
+        . $andKategorie
+        . $andJahr
+        . $andZahlungsmittel;
+
+$queryUnion = " Union " // Fixkosten
+        . " SELECT e.ID, dt.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang, e.betrag, e.kategorie_id, e.interval,   
   case when e.interval = 'Y' then 'jährlich' when e.interval = 'Q' then 'quartalsweise' when e.interval = 'M' then 'monatlich' when ifnull(e.interval,'') = '' or e.interval = 'E' then 'einmalig' END AS int_bez,
   case when e.typ = 'V' then 'Variabel' when e.typ = 'F' then 'Fix' ELSE '' END  typ_bez,
   case when e.art = 'A' then 'Ausgaben'  when e.art = 'E' then 'Einnahmen' ELSE '' END  art_bez,
@@ -240,21 +247,28 @@ if ($f != "sum") {
   JOIN konten k ON e.kontonr = k.kontonr 
   LEFT JOIN zahlungsmittel z ON z.ID = e.zahlungsmittel_id 
   JOIN dates_tmp dt ON e.ID=dt.einausgabe_id AND dt.einausgabe_id = e.ID  Where e.ID > -1 "
-            . $andKonto
-            . $andDatumUnion
-            . $andEndDatum
-            . $andArt
-            . $andTyp
-            . $andVorgang
-            . $andHerkunft
-            . $andInterval
-            . $andZahlungsmittel
-            . $andZeitraumUnion
-            . $andJahrUnion
-            . $andKategorie;
+        . $andKonto
+        . $andDatumUnion
+        . $andEndDatum
+        . $andArt
+        . $andTyp
+        . $andVorgang
+        . $andHerkunft
+        . $andInterval
+        . $andZahlungsmittel
+        . $andZeitraumUnion
+        . $andJahrUnion
+        . $andKategorie;
+
+if ($f != "sum") {
+    if ($ausw == "B") {
+        $querySQL = $queryOrig . $queryUnion;
+    } else {
+        $querySQL = $queryOrig;
+    }
 
     file_put_contents("einAusgabeDS.txt", $querySQL);
-    /* @var $rs string */
+
     $rs = $dbSyb->Execute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?
 // Ausgabe initialisieren
 

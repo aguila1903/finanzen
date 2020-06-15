@@ -36,6 +36,7 @@ function setCriteria()
         enddatum: refreshEinAusgabenListen(dfEinAusgabenFilter, "enddatum"),
         datum: refreshEinAusgabenListen(dfEinAusgabenFilter, "datum"),
         konto: refreshEinAusgabenListen(dfEinAusgabeKonten, "konten"),
+        auswahl: dfEinAusgabeKonten.getField("auswahl").getValue(),
         vorgang: refreshEinAusgabenListen(dfEinAusgabenFilter, "vorgang"),
         monat_jahr: refreshEinAusgabenListen(dfEinAusgabenFilter, "monat_jahr"),
         jahr: refreshEinAusgabenListen(dfEinAusgabenFilter, "jahr"),
@@ -92,6 +93,10 @@ function fetchEinAusgaben(_form)
 //    if (typeof (dfEinAusgabeKonten.getField("konto").getValue()) !== noSearch) {
     _kontonr = refreshEinAusgabenListen(dfEinAusgabeKonten, "konten");
 //    }
+    if (typeof (dfEinAusgabeKonten.getField("auswahl").getValue()) !== noSearch)
+    {
+        _auswahl = dfEinAusgabeKonten.getField("auswahl").getValue();
+    }
     if (typeof (_form.getField("vorgang").getValue()) !== noSearch)
     {
         _vorgang = refreshEinAusgabenListen(_form, "vorgang");
@@ -111,11 +116,11 @@ function fetchEinAusgaben(_form)
 
     lgEinAusgaben.fetchData({"jahr": _jahr, "monat_jahr": _monat_jahr, "enddatum": _enddatum, "art": _art, "typ": _typ, "datum": _datum,
         "konto": _kontonr, "vorgang": _vorgang, "herkunft": _herkunft, "interval": _interval,
-        "kategorie": _kategorie, zahlungsmittel: _zahlungsmittel_id, counter: ++_form.counter});
-    getSumEinAusgaben(totalsLabelEinAusgaben, "api/ds/einAusgabenDS.php", _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id);
+        "kategorie": _kategorie, zahlungsmittel: _zahlungsmittel_id, auswahl: _auswahl, counter: ++_form.counter});
+    getSumEinAusgaben(totalsLabelEinAusgaben, "api/ds/einAusgabenDS.php", _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id, _auswahl);
 }
 ;
-function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id)
+function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id, _auswahl)
 {
 
     RPCManager.send("", function (rpcResponse, data, rpcRequest)
@@ -136,7 +141,7 @@ function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _
         params: {
             f: "sum", "jahr": _jahr, "monat_jahr": _monat_jahr, "enddatum": _enddatum, "art": _art, "typ": _typ, "datum": _datum,
             "konto": _kontonr, "vorgang": _vorgang, "herkunft": _herkunft, "interval": _interval, zahlungsmittel: _zahlungsmittel_id,
-            "kategorie": _kategorie
+            "kategorie": _kategorie, "auswahl": _auswahl
         }
     }); //Ende RPC
 
@@ -770,7 +775,7 @@ isc.HTMLPane.create({
 isc.DynamicForm.create({
     ID: "dfEinAusgabeKonten",
     monCnt: 0,
-    width: 100,
+    width: 600,
     height: 10,
     margin: 0,
     numCols: 2,
@@ -796,7 +801,19 @@ isc.DynamicForm.create({
             },
             changed: function (form, item, value)
             {
-                console.log(value);
+//                console.log(value);
+                fetchEinAusgaben(dfEinAusgabenFilter);
+            }
+        }, {
+            name: "auswahl",
+            title: "Anzeige der Daten",
+            valueMap: {"B": "berechnete Werte", "O": "original Werte"},
+            defaultValue: "B",
+            type: "radioGroup",
+            redrawOnChange: true,
+            vertical: false,
+            changed: function (form, item, value)
+            {
                 fetchEinAusgaben(dfEinAusgabenFilter);
             }
         }
