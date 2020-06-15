@@ -1054,6 +1054,10 @@ isc.IButton.create({
 //                        AusgabenListeDetails.invalidateCache();
                         AusgabenListe.invalidateCache();
                         findRecord(AusgabenListe, id_al);
+                        isc.Timer.setTimeout(function ()
+                        {
+                            findRecord(AusgabenListeDetails, id_ald);
+                        }, 500);
                         if (!dfUmsaetzeEdit.validate() && dfUmsaetzeEdit.hasErrors())
                         {
                             dfUmsaetzeEdit.setErrors();
@@ -1331,7 +1335,8 @@ isc.IButton.create({
             if (AusgabenListe.getTotalRows() > 0)
             {
                 id_al = AusgabenListe.getSelectedRecord().ID;
-            }else{
+            } else
+            {
                 id_al = 0;
             }
             RPCManager.send("", function (rpcResponse, data, rpcRequest)
@@ -1344,6 +1349,10 @@ isc.IButton.create({
 
                     AusgabenListe.invalidateCache();
                     findRecord(AusgabenListe, id_al);
+                    isc.Timer.setTimeout(function ()
+                    {
+                        findRecord(AusgabenListeDetails, id_ald);
+                    }, 500);
 
                     if (!dfUmsaetzeAdd.validate() && dfUmsaetzeAdd.hasErrors())
                     {
@@ -1500,7 +1509,6 @@ isc.ToolStripButton.create({
 
                             isc.say("Datensatz wurde erfolgreich gelöscht.");
                             AusgabenListe.invalidateCache();
-                            findRecord(AusgabenListe, id_al);
 
                         } else
                         { // Wenn die Validierungen Fehler aufweisen dann:
@@ -1976,9 +1984,12 @@ isc.IButton.create({
                         }
                     } else
                     {
-//                        AusgabenListeDetails.invalidateCache();
                         AusgabenListe.invalidateCache();
                         findRecord(AusgabenListe, id_al);
+                        isc.Timer.setTimeout(function ()
+                        {
+                            findRecord(AusgabenListeDetails, id_ald);
+                        }, 500);
 
                         isc.say("Datensatz wurde erfolgreich eingefügt.", function (value)
                         {
