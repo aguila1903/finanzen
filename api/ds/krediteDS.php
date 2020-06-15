@@ -66,7 +66,7 @@ $querySQL = " SELECT
     END as rest_betrag
   FROM einausgaben e JOIN kategorien k ON e.kategorie_id=k.ID 
   WHERE e.typ = 'F' AND ifnull(detail,'N') = 'J'
-  AND DATE_FORMAT(datum,\"%Y%m%d\") <= DATE_FORMAT(enddatum,\"%Y%m%d\");";
+  AND DATE_FORMAT(curdate(),\"%Y%m%d\") <= DATE_FORMAT(enddatum,\"%Y%m%d\");";
 
 
 $rs = $dbSyb->Execute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?
@@ -86,7 +86,7 @@ else {
     $i = 0;
 
     while (!$rs->EOF) {
-        $betrag = ($rs->fields['art'] == "A") ? $rs->fields['betrag'] * (-1) : $rs->fields['betrag'];
+        $betrag = $rs->fields['betrag'];
         $rate_rest = intval($rs->fields['max_rate']) - intval($rs->fields['rate']);
         $data[$i]["ID"] = $rs->fields['ID'];
         $data[$i]["vorgang"] = $rs->fields['vorgang'];
@@ -102,10 +102,10 @@ else {
         $data[$i]["enddatum"] = $rs->fields['enddatum'];
         $data[$i]["document"] = $rs->fields['dokument'];
         $data[$i]["letzte_zahlung"] = $rs->fields['letzte_zahlung'];
-        $data[$i]["betrag"] = number_format($betrag, 2, ',', '.');
-        $data[$i]["betrag_gezahlt"] = number_format($rs->fields['betrag_gezahlt'], 2, ',', '.');
-        $data[$i]["gesamt_betrag"] = number_format($rs->fields['gesamt_betrag'], 2, ',', '.');
-        $data[$i]["rest_betrag"] = number_format($rs->fields['gesamt_betrag']-$rs->fields['betrag_gezahlt'], 2, ',', '.');
+        $data[$i]["betrag"] = number_format($betrag*(-1), 2, ',', '.');
+        $data[$i]["betrag_gezahlt"] = number_format($rs->fields['betrag_gezahlt']*(-1), 2, ',', '.');
+        $data[$i]["gesamt_betrag"] = number_format($rs->fields['gesamt_betrag']*(-1), 2, ',', '.');
+        $data[$i]["rest_betrag"] = number_format(($rs->fields['gesamt_betrag']-$rs->fields['betrag_gezahlt'])*(-1), 2, ',', '.');
         $i++;
 
         $rs->MoveNext();

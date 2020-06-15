@@ -2276,13 +2276,13 @@ addNode("VLayoutUmsaetze", {
     {
         // Dropzone verstecken
         htmlPaneDropZoneUmsaetze.hide();
+        clearCharts('');
         // Konto-Selektor fixen
         if (counterUmsatz == 0)
-        {
+        {            
             setValue2Field(dfKonten, 'kontonr', "Konto wählen");
             counterUmsatz++;
-            AusgabenListeDetails.contextMenu = menuUmsaetze;
-            clearCharts('');
+            AusgabenListeDetails.contextMenu = menuUmsaetze;            
         }
 
     },
