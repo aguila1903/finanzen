@@ -2422,16 +2422,22 @@ isc.ToolStripButton.create({
     {
         if (lgEinAusgaben.getSelection().length == 1)
         {
-            var record = lgEinAusgaben.getSelectedRecord();
-            dfEinAusgaben.editRecord(record);
-            wdEinAusgabe.show();
-            wdEinAusgabe.setTitle("Editieren eines Vorgangs");
-            dfEinAusgaben.getField("action").setValue("edit");
-            setValue2Field(dfEinAusgaben, 'typ', record.typ);
-            setValue2Field(dfEinAusgaben, 'datum', record.datum);
+            if (dfEinAusgabeKonten.getField("auswahl").getValue() == "O")
+            {
+                var record = lgEinAusgaben.getSelectedRecord();
+                dfEinAusgaben.editRecord(record);
+                wdEinAusgabe.show();
+                wdEinAusgabe.setTitle("Editieren eines Vorgangs");
+                dfEinAusgaben.getField("action").setValue("edit");
+                setValue2Field(dfEinAusgaben, 'typ', record.typ);
+                setValue2Field(dfEinAusgaben, 'datum', record.datum);
 //            setValue2Field(dfEinAusgaben, 'detail', record.detail);
-            setValue2Field(dfEinAusgaben, "detail", record.detail);
-            resetButtons(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
+                setValue2Field(dfEinAusgaben, "detail", record.detail);
+                resetButtons(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
+            } else
+            {
+                isc.say("Änderungen lassen sich nur vornehmen, wenn die Anzeige auf originale Werte gestellt ist!");
+            }
         } else
         {
             isc.say("Bitte erst einen Datensatz wählen");

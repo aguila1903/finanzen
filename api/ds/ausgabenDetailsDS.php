@@ -80,7 +80,7 @@ else {
         $data[$i]["ID"] = $rs->fields['ID'];
 //        $datum = explode(".", $rs->fields['datum']);        
 //        $data[$i]["datum"] = $datum[2]."-".$datum[1]."-".$datum[0];
-        $data[$i]["datum"] = str_replace(' ', 'T', $rs->fields['datum']) . "+02:00";
+        $data[$i]["datum"] = str_replace(' ', 'T', $rs->fields['datum']);
 //        $data[$i]["betrag"] = number_format($rs->fields['betrag'], 2, ',', '.');     
         $data[$i]["vorgang"] = ($rs->fields['vorgang']);
         $data[$i]["herkunft"] = ($rs->fields['herkunft']);
