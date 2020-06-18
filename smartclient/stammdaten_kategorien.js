@@ -84,13 +84,10 @@ isc.ListGrid.create({
     initialSort: [{
             property: "bezeichnung",
             direction: "ascending"
-        }, {
-            property: "art_bez",
-            direction: "ascending"
         }
     ],
     groupStartOpen: "all",
-    groupByField: ['typ_bez'],
+//    groupByField: ['typ_bez'],
     showGridSummary: true,
     fields: [
         {
@@ -110,7 +107,8 @@ isc.ListGrid.create({
         {
             name: "typ_bez",
             title: "Typ",
-            width: 200
+            width: 200,
+            showIf: "false"
         },
         {
             name: "art",
@@ -168,12 +166,12 @@ isc.DynamicForm.create({
             name: "typ",
             title: "Kostentyp",
             width: 300,
-            required: true,
-            type: "radioGroup",
+            required: false,
             redrawOnChange: true,
+            type: "hidden",
             vertical: false,
             valueMap: {"V": "Variabel", "F": "Fix"},
-            defaultValue: "V",
+            defaultValue: "N",
             changed: function (form, item, value)
             {
                 changeFunction(btnSpeichernStammKategorienAdd, btnResetStammKategorienAdd, btnCloseStammKategorienAdd);
@@ -433,11 +431,11 @@ isc.DynamicForm.create({
             title: "Kostentyp",
             width: 300,
             required: true,
-            type: "radioGroup",
+            type: "hidden",
             redrawOnChange: true,
             vertical: false,
             valueMap: {"V": "Variabel", "F": "Fix"},
-            defaultValue: "V",
+            defaultValue: "N",
             changed: function (form, item, value)
             {
                 changeFunction(btnSpeichernStammKategorienEdit, btnResetStammKategorienEdit, btnCloseStammKategorienEdit);

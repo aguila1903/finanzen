@@ -61,7 +61,7 @@ if (isset($_REQUEST["bezeichnung"])) {
 if (isset($_REQUEST["typ"])) {
     $typ = $_REQUEST["typ"];
     if ($typ != "null" && $typ != "") {
-        if ((preg_match("/^[fvFV]{1}?$/", trim($typ))) == 0) {
+        if ((preg_match("/^[fvFVN]{1}?$/", trim($typ))) == 0) {
 
             $out['response']['status'] = -4;
             $out['response']['errors'] = array('typ' => "Bitte den Typ prüfen");

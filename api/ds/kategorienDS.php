@@ -72,7 +72,7 @@ if (isset($_REQUEST["art"])) {
     $whereArt = "";
 }
 
-$querySQL = "Select ID, bezeichnung from kategorien where ID > -1 $whereTyp /*$whereArt*/  Order by bezeichnung;";
+$querySQL = "Select ID, bezeichnung from kategorien where ID > -1 /* $whereTyp $whereArt*/  Order by bezeichnung;";
 
 
 /* @var $rs string */

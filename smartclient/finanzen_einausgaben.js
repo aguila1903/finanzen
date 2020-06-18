@@ -22,7 +22,14 @@ var refreshEinAusgabenListen = function (_form, _fieldName)
     var string = "";
     if (_form.getField(_fieldName).getValue())
     {
-        var field = _form.getField(_fieldName).getValue();
+        if (_fieldName == "kategorie_id")
+        {
+            var field = _form.getField(_fieldName).getDisplayValue();
+        } else
+        {
+            var field = _form.getField(_fieldName).getValue();
+        }
+
         string = field.join(",");
     }
 
@@ -42,7 +49,7 @@ function setCriteria()
         jahr: refreshEinAusgabenListen(dfEinAusgabenFilter, "jahr"),
         herkunft: refreshEinAusgabenListen(dfEinAusgabenFilter, "herkunft"),
         interval: refreshEinAusgabenListen(dfEinAusgabenFilter, "interval"),
-        kategorie: dfEinAusgabenFilter.getField("kategorie_id").getDisplayValue(),
+        kategorie: refreshEinAusgabenListen(dfEinAusgabenFilter, "kategorie_id"),
         zahlungsmittel: refreshEinAusgabenListen(dfEinAusgabenFilter, "zahlungsmittel"),
         count: ++dfEinAusgabenFilter.counter
     };
@@ -111,7 +118,7 @@ function fetchEinAusgaben(_form)
     }
     if (typeof (_form.getField("kategorie_id").getDisplayValue()) !== noSearch)
     {
-        _kategorie = _form.getField("kategorie_id").getDisplayValue();
+        _kategorie = refreshEinAusgabenListen(dfEinAusgabenFilter, "kategorie_id");
     }
 
     lgEinAusgaben.fetchData({"jahr": _jahr, "monat_jahr": _monat_jahr, "enddatum": _enddatum, "art": _art, "typ": _typ, "datum": _datum,
