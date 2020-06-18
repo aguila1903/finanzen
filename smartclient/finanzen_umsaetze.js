@@ -738,12 +738,12 @@ isc.ListGrid.create({
     filterOnKeypress: true,
 //    baseStyle: "myOtherGridCell",
     fetchDelay: 500,
-    selectionType: "multi",
+    selectionType: "single",
     showAllRecords: true,
     canExpandRecords: false,
     expansionMode: "details",
     margin: 0,
-    sortField: "datum",
+//    sortField: "datum",
     showGridSummary: true,
     fields: [
         {

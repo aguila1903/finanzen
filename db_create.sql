@@ -132,6 +132,17 @@ CREATE TABLE IF NOT EXISTS `kreditkarten_abr` (
 
 -- Daten Export vom Benutzer nicht ausgewählt
 
+-- Exportiere Struktur von Tabelle finanz_db.module
+DROP TABLE IF EXISTS `module`;
+CREATE TABLE IF NOT EXISTS `module` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `modul` varchar(264) NOT NULL,
+  `admin` char(1) NOT NULL DEFAULT '',
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Daten Export vom Benutzer nicht ausgewählt
+
 -- Exportiere Struktur von Tabelle finanz_db.monats_ausgaben
 DROP TABLE IF EXISTS `monats_ausgaben`;
 CREATE TABLE IF NOT EXISTS `monats_ausgaben` (
@@ -373,7 +384,8 @@ SELECT
 	   vorgang, ifnull(rtrim(extern),'N') as extern, ifnull(herkunft,'---') as herkunft, ifnull(buchungstext,'---') as buchungstext,  
 	   ausgabe as betrag, kontonr, einausgaben_id
   FROM monats_ausgaben
-  Where month(datum) = SUBSTRING(var_monat,1,2) and year(datum) = SUBSTRING(var_monat,3,4) and ausgabe < 0 and kontonr = var_giroSpar;
+  Where month(datum) = SUBSTRING(var_monat,1,2) and year(datum) = SUBSTRING(var_monat,3,4) and ausgabe < 0 and kontonr = var_giroSpar
+  ORDER BY datum;
 End//
 DELIMITER ;
 
@@ -406,6 +418,34 @@ GROUP BY DATE_FORMAT(datum, '%m%Y') , DATE_FORMAT(datum, '%Y%m') , kontonr
 ORDER BY sort DESC; 
 
   End//
+DELIMITER ;
+
+-- Exportiere Struktur von Prozedur finanz_db.dashboard_ausgaben_gesamt
+DROP PROCEDURE IF EXISTS `dashboard_ausgaben_gesamt`;
+DELIMITER //
+CREATE PROCEDURE `dashboard_ausgaben_gesamt`()
+BEGIN
+
+SELECT 
+-- Fixkosten
+IFNULL((SELECT SUM(ifnull(betrag,0)) + IFNULL((SELECT SUM(ifnull(betrag,0))
+FROM  einausgaben  
+WHERE art = 'A' AND date_format(datum, "%Y%m") = DATE_FORMAT(a.datum,"%Y%m") AND typ = 'F'),0)
+FROM  einausgaben e JOIN dates_tmp d on e.ID=d.einausgabe_id
+WHERE art = 'A'  AND DATE_FORMAT(d.datum, "%Y%m") = DATE_FORMAT(a.datum,"%Y%m") 
+),0)  AS fixkosten,
+-- Variable Kosten
+IFNULL((SELECT SUM(ifnull(betrag,0))
+FROM  einausgaben e 
+WHERE art = 'A' AND e.typ = 'V'  AND DATE_FORMAT(e.datum, "%Y%m") = DATE_FORMAT(a.datum,"%Y%m")),0) AS variable_kosten, 
+-- Stand
+date_format(a.datum, "%Y%m") AS stand
+
+FROM einausgaben a 
+Where DATE_FORMAT(a.datum,"%Y%m%d") between '202001' AND DATE_FORMAT(CURDATE(),"%Y%m%d") 
+GROUP BY DATE_FORMAT(a.datum,"%Y%m");
+
+END//
 DELIMITER ;
 
 -- Exportiere Struktur von Prozedur finanz_db.dashboard_ausg_kat
@@ -878,7 +918,7 @@ BEGIN
    
   
   
--- DELETE FROM prognosedaten WHERE DATE_FORMAT(monat,"%Y%m") =  DATE_FORMAT(var_progMonat,"%Y%m");
+DELETE FROM prognosedaten WHERE DATE_FORMAT(monat,"%Y%m") =  DATE_FORMAT(var_progMonat,"%Y%m");
   
   
 INSERT into prognosedaten (monat, vorgang, betrag, kontotyp, kategorie, art, kontonr)
@@ -892,14 +932,13 @@ FROM monats_ausgaben p
 JOIN konten k ON p.kontonr=k.kontonr
 JOIN konten_typen kt ON k.kontotyp=kt.kontotyp
 WHERE DATE_FORMAT(a.datum,"%Y%m") < DATE_FORMAT(var_progMonat,"%Y%m") AND p.kontonr = a.kontonr),0) +
--- Kontostand aktueller Monat
 
--- Anfallende Fixkosten Prognose-Monat
+
 
 IFNULL((SELECT SUM(betrag) FROM vw_fixkosten f WHERE date_format(f.datum,"%Y%m%d") >= date_format(CURDATE(),"%Y%m%d") 
 AND date_format(f.datum,"%Y%m%d") <= last_day(date_format(DATE_ADD(var_progMonat, INTERVAL -1 MONTH),"%Y%m%d")) AND f.kontonr=a.kontonr),0)
 	
--- Anfallende Fixkosten Prognose-Monat
+-- Kontostand aktueller Monat
 
 +
 case When var_monat > 1 
@@ -922,7 +961,7 @@ JOIN einausgaben e ON a.kontonr=e.kontonr
 GROUP BY a.kontonr
 -- Ende Einfügen der Kontostände 
 Union
--- Einfügen der Fixkosten 
+-- Einfügen der Fixkosten aus der Tabelle dates_tmp
 Select  var_progMonat,
   vorgang,
   betrag,  
@@ -937,6 +976,21 @@ Select  var_progMonat,
   where DATE_FORMAT(var_progMonat,"%Y%m") = DATE_FORMAT(dt.datum,"%Y%m")
   
 -- Ende Einfügen der Fixkosten 
+
+UNION
+-- Einfügen der Fixkosten aus der Tabelle einausgaben
+  Select  var_progMonat,
+  vorgang,
+  betrag,  
+  ko.kontotyp,
+  k.bezeichnung, 
+  case when betrag < 0 then 'A' ELSE 'E' END,
+  a.kontonr
+  from einausgaben a 
+  JOIN kategorien k on a.kategorie_id = k.ID
+  JOIN konten ko ON a.kontonr = ko.kontonr
+  where DATE_FORMAT(var_progMonat,"%Y%m") = DATE_FORMAT(a.datum,"%Y%m")
+-- Ende Einfügen der Fixkosten
  
 Union
 

@@ -75,7 +75,7 @@ if (!is_dir($update_logs_dir)) {
     mkdir($update_logs_dir, 0777, true);
 }
 
-
+@copy("../db_create.sql", PATH_BACKUPS . "reset.sql");
 
 //Git
 if (domainAvailable('https://github.com/')) {
@@ -86,6 +86,7 @@ if (domainAvailable('https://github.com/')) {
     print json_encode($out);
     return;
 }
+
 
 
 if (is_file($update_sql_new)) {//Es befindet sich eine Datei im sql-update Ordner

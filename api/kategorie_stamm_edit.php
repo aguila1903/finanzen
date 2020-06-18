@@ -106,7 +106,7 @@ if (isset($_REQUEST["typ"])) {
 if (isset($_REQUEST["art"])) {
     $art = $_REQUEST["art"];
     if ($art != "null" && $art != "") {
-        if ((preg_match("/^[eaAE]{1}?$/", trim($art))) == 0) {
+        if ((preg_match("/^[eaAEN]{1}?$/", trim($art))) == 0) {
 
             $out['response']['status'] = -4;
             $out['response']['errors'] = array('art' => "Bitte die Art prüfen");
