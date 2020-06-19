@@ -11,7 +11,7 @@
  * 
  */
 
-
+counterEinAusg = 0;
 /*
  * *********************** GoTo: FUNKTIONEN ************************************
  * =============================================================================
@@ -2720,10 +2720,12 @@ addNode("HLayoutEinAusgabeFilter_List", {
         fetchEinAusgaben(dfEinAusgabenFilter);
         lgEinAusgaben.contextMenu = menuEinAusgabe;
         htmlPaneDropZoneEinAusgabe.hide();
-//        PaneKredite.clear();
-//        htmlPaneVergleichsGrafikKreditKarten.clear();
         clearCharts('');
-        setValue2Field(dfEinAusgabenFilter, "monat_jahr", [_Monat]);
+        if (counterEinAusg == 0)
+        {
+            setValue2Field(dfEinAusgabenFilter, "monat_jahr", [_Monat]);
+        }
+        counterEinAusg++;
     },
     treenode: {
         Name: "HLayoutEinAusgabeFilter_List",

@@ -205,6 +205,12 @@ if (isset($_REQUEST["lookFor"])) {
     $lookFor = "";
 }
 
+if (isset($_REQUEST["auswahl"])) {
+    $ausw = $_REQUEST["auswahl"];
+} else {
+    $ausw = "B";
+}
+
 $Select = " select distinct ";
 $field2 = "";
 
@@ -248,7 +254,7 @@ if ($lookFor == "zahlungsmittel") {
     $field = "  ifnull(e.zahlungsmittel_id,0) as zahlungsmittel_id, ifnull(z.bezeichnung,'---') AS zahlungsmittel_bez, ifnull(z.bezeichnung,'---') AS sort ";
 }
 
-$querySQL = "$Select$field 
+$queryOrig = "$Select$field 
  FROM einausgaben e 
   JOIN konten k ON e.kontonr=k.kontonr
   LEFT JOIN zahlungsmittel z ON z.ID = e.zahlungsmittel_id 
@@ -264,11 +270,12 @@ $querySQL = "$Select$field
         . $andZeitraum
         . $andKategorie
         . $andZahlungsmittel
-        . $andJahr
-        . " Union "
+        . $andJahr;
+
+$queryUnion = " Union "
         . " $Select";
-$querySQL .= (!empty($field2)) ? $field2 : $field;
-$querySQL .= " from einausgaben e 
+$queryUnion .= (!empty($field2)) ? $field2 : $field;
+$queryUnion .= " from einausgaben e 
   JOIN kategorien ka on e.kategorie_id = ka.ID
   JOIN konten k ON e.kontonr = k.kontonr 
   LEFT JOIN zahlungsmittel z ON z.ID = e.zahlungsmittel_id 
@@ -286,7 +293,12 @@ $querySQL .= " from einausgaben e
         . $andZeitraumUnion
         . $andKategorie;
 
-$querySQL .= " order by sort ";
+
+if ($ausw == "B") {
+    $querySQL = $queryOrig . $queryUnion . " order by sort ";
+} else {
+    $querySQL = $queryOrig . " order by sort ";
+}
 
 file_put_contents("queryFilter.txt", $querySQL);
 /* @var $rs string */
