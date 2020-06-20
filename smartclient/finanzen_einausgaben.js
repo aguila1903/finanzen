@@ -1352,7 +1352,7 @@ isc.DynamicForm.create({
             }
         }, {
             name: "bundle",
-            title: "Einkauf",
+            title: "zu einem Einkauf hinzufügen",
             width: 300,
             required: false,
             type: "comboBox",

@@ -187,8 +187,8 @@ isc.DynamicForm.create({
             },
             changed: function (form, item, value)
             {
-                console.log(value);
-                refreshPrognoseListen();
+//                console.log(value);
+//                refreshPrognoseListen();
             }
         }
     ]

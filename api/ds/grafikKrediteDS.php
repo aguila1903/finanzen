@@ -46,8 +46,8 @@ if ($ausw == "A") {
 
 $querySQL = " SELECT 
     vorgang,
-    (case when TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) >= dauer then dauer else TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) end) * betrag as betrag_gezahlt,
-    ((case when TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) >= dauer then dauer else TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) end) * betrag) -
+     (case when TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) >= dauer then dauer when TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),CURDATE()) < 0 then 0 else TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) end) * betrag as betrag_gezahlt,
+    ((case when TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) >= dauer then dauer when TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),CURDATE()) < 0 then 0 else TIMESTAMPDIFF(month,ADDDATE(datum, INTERVAL -1 month),curdate()) end) * betrag) -
     (dauer * betrag) AS rest_betrag
 FROM
     einausgaben a
