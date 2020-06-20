@@ -1003,14 +1003,20 @@ isc.ListGrid.create({
     gridComponents: [/*"filterEditor",*/ "header", "body", gridEditControlsEinAusgaben/*, "summaryRow"*/],
     recordDoubleClick: function (viewer, record, recordNum, field, fieldNum, value, rawValue)
     {
-        wdEinAusgabe.show();
-        dfEinAusgaben.editRecord(record);
-        dfEinAusgaben.getField("action").setValue("edit");
-        wdEinAusgabe.setTitle("Editieren eines Vorgangs");
-        setValue2Field(dfEinAusgaben, 'typ', record.typ);
-        setValue2Field(dfEinAusgaben, 'datum', record.datum);
-        setValue2Field(dfEinAusgaben, 'detail', record.detail);
-        resetButtons(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
+        if (dfEinAusgabeKonten.getField("auswahl").getValue() == "O")
+        {
+            wdEinAusgabe.show();
+            dfEinAusgaben.editRecord(record);
+            dfEinAusgaben.getField("action").setValue("edit");
+            wdEinAusgabe.setTitle("Editieren eines Vorgangs");
+            setValue2Field(dfEinAusgaben, 'typ', record.typ);
+            setValue2Field(dfEinAusgaben, 'datum', record.datum);
+            setValue2Field(dfEinAusgaben, 'detail', record.detail);
+            resetButtons(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
+        } else
+        {
+            isc.say("Änderungen lassen sich nur vornehmen, wenn die Anzeige auf originale Werte gestellt ist!");
+        }
     }
 });
 /*
@@ -2614,6 +2620,54 @@ isc.ToolStripButton.create({
     hoverWidth: 100,
     hoverDelay: 700
 });
+
+isc.ToolStripButton.create({
+    ID: "tsbEinAusgabenCloneAndEdit",
+    action: function ()
+    {
+        if (lgEinAusgaben.getSelection().length == 1)
+        {
+
+            RPCManager.send("", function (rpcResponse, data, rpcRequest)
+            {
+                var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
+                if (_data.response.status === 0)
+                {  // Status 0 bedeutet Keine Fehler
+                    id = _data.response.data["ID"];
+                    fetchEinAusgaben(dfEinAusgabenFilter);
+                    isc.Timer.setTimeout("btnSpeichernEinAusgabe.isLoadingEinAusgabeTimer()", 150);
+
+                } else
+                { // Wenn die Validierungen Fehler aufweisen dann:                            
+                    var _errors = _data.response.errors;
+                    isc.say("<b>Fehler! </br>" + _errors + "</b>");
+                }
+            }, {// Übergabe der Parameter
+                actionURL: "api/ein_ausgabe_clone.php",
+                httpMethod: "POST",
+                contentType: "application/x-www-form-urlencoded",
+                useSimpleHttp: true,
+                params: {
+                    ID: lgEinAusgaben.getSelectedRecord().ID
+                }
+
+            }); //Ende RPC   
+
+
+        } else
+        {
+            isc.say("Bitte erst einen Datensatz wählen");
+        }
+    },
+    prompt: "Vorgang klonen",
+    icon: "web/32/blogs.png",
+    title: "",
+    showDisabledIcon: false,
+    iconHeight: 32,
+    iconWidth: 32,
+    hoverWidth: 100,
+    hoverDelay: 700
+});
 /*
  * *********************** ANFANG MENU *************************
  * -------------------------------------------------------------
@@ -2651,6 +2705,11 @@ isc.Menu.create({
         {title: tsbEinAusgabenDeleteDoc.prompt, icon: tsbEinAusgabenDeleteDoc.icon, click: function ()
             {
                 tsbEinAusgabenDeleteDoc.action();
+            }},
+        {isSeparator: true},
+        {title: tsbEinAusgabenCloneAndEdit.prompt, icon: tsbEinAusgabenCloneAndEdit.icon, click: function ()
+            {
+                tsbEinAusgabenCloneAndEdit.action();
             }}
     ]
 });

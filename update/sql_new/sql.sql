@@ -11,54 +11,77 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
--- Exportiere Struktur von Prozedur finanz_db.ausgabenDetailsDS
-DROP PROCEDURE IF EXISTS `ausgabenDetailsDS`;
+-- Exportiere Struktur von Prozedur finanz_db.umsaetzeKategorieClone
+DROP PROCEDURE IF EXISTS `umsaetzeKategorieClone`;
 DELIMITER //
-CREATE PROCEDURE `ausgabenDetailsDS`(
-	IN `var_monat` CHAR(6),
-	IN `var_giroSpar` VARCHAR(50)
+CREATE PROCEDURE `umsaetzeKategorieClone`(
+	IN `Var_ID` int
 )
-root: BEGIN
-DECLARE monat CHAR(2);
-DECLARE jahr CHAR(4);
+root:BEGIN
 
-SET monat = SUBSTRING(var_monat,1,2);
-SET jahr = SUBSTRING(var_monat,3,4);
+Declare Var_anzahl INT;
+DECLARE Var_date_tmp DATE;
+DECLARE Var_newID INT;
+DECLARE Var_id2 INT;
+DECLARE Var_interval CHAR(1);
+DECLARE Var_enddatum DATE;
+DECLARE Var_datum DATE;
 
-SELECT 
-	0 AS ID, 
-	CONCAT(jahr,'-',monat,'-01') AS datum,
-	'ÜBERTRAG VORMONAT' AS vorgang,
-	'N' AS extern,
-	'ÜBERTRAG VORMONAT' AS herkunft,
-	'ÜBERTRAG VORMONAT' AS buchungstext,
-	SUM(ifnull(ausgabe,0) + ifnull(einnahme,0)) AS betrag,
-	a.kontonr,
-	NULL as einausgaben_id
-FROM monats_ausgaben a JOIN konten k ON  a.kontonr=k.kontonr
-JOIN konten_typen kt ON k.kontotyp=kt.kontotyp
-WHERE a.kontonr = var_giroSpar AND date_format(a.datum,"%Y%m") < CONCAT(jahr,monat)
-GROUP BY a.kontonr
+SET Var_interval = (SELECT `interval` FROM einausgaben WHERE ID = Var_ID);
+SET Var_enddatum = (SELECT `enddatum` FROM einausgaben WHERE ID = Var_ID);
+SET Var_datum = (SELECT `datum` FROM einausgaben WHERE ID = Var_ID);
 
-UNION	  
 
-SELECT 
-      ID,
-	   datum as datum,
-	   vorgang, ifnull(rtrim(extern),'N') as extern, ifnull(herkunft,'---') as herkunft, ifnull(buchungstext,'---') as buchungstext,  
-	   einnahme as betrag, kontonr, einausgaben_id
-  FROM monats_ausgaben
-  Where month(datum) = SUBSTRING(var_monat,1,2) and year(datum) = SUBSTRING(var_monat,3,4) and einnahme > 0 and kontonr = var_giroSpar
-  Union
- SELECT 
-       ID,
-	   datum as datum,
-	   vorgang, ifnull(rtrim(extern),'N') as extern, ifnull(herkunft,'---') as herkunft, ifnull(buchungstext,'---') as buchungstext,  
-	   ausgabe as betrag, kontonr, einausgaben_id
-  FROM monats_ausgaben
-  Where month(datum) = SUBSTRING(var_monat,1,2) and year(datum) = SUBSTRING(var_monat,3,4) and ausgabe < 0 and kontonr = var_giroSpar
-  ORDER BY datum;
-End//
+
+Start Transaction;
+ 
+INSERt INTO einausgaben 
+(art, typ, kontonr, vorgang, betrag, kategorie_id, datum, dauer, `interval`, enddatum, herkunft, detail, kommentar, zahlungsmittel_id, bundle) 
+Select art, typ, kontonr, vorgang, betrag, kategorie_id, datum, dauer, `interval`, enddatum, herkunft, detail, kommentar, zahlungsmittel_id, bundle FROM einausgaben WHERE ID = Var_ID ;
+
+set Var_anzahl = ROW_COUNT();
+
+
+SET Var_newID = (Select max(ID) from einausgaben);
+
+
+if Var_interval = 'Q'
+Then
+SET Var_date_tmp = DATE_ADD(Var_datum, INTERVAL 1 QUARTER); 
+  While DATE_FORMAT(Var_date_tmp, "%Y%m") <= DATE_FORMAT(Var_enddatum, "%Y%m") DO
+    INSERT INTO dates_tmp (einausgabe_id, datum) VALUES(Var_newID, Var_date_tmp);
+    SET Var_date_tmp = DATE_ADD(Var_date_tmp, INTERVAL 1 QUARTER); 
+  END While;
+END if;
+
+
+if Var_interval = 'Y'
+Then
+SET Var_date_tmp = DATE_ADD(Var_datum, INTERVAL 1 YEAR); 
+  While DATE_FORMAT(Var_date_tmp, "%Y%m") <= DATE_FORMAT(Var_enddatum, "%Y%m") DO  
+    INSERT INTO dates_tmp (einausgabe_id, datum) VALUES(Var_newID, Var_date_tmp);
+    SET Var_date_tmp = DATE_ADD(Var_date_tmp, INTERVAL 1 YEAR); 
+  END While;
+END if;
+
+
+if Var_interval = 'M'
+Then
+SET Var_date_tmp = DATE_ADD(Var_datum, INTERVAL 1 MONTH); 
+  While DATE_FORMAT(Var_date_tmp, "%Y%m") <= DATE_FORMAT(Var_enddatum, "%Y%m") DO  
+    INSERT INTO dates_tmp (einausgabe_id, datum) VALUES(Var_newID, Var_date_tmp);
+    SET Var_date_tmp = DATE_ADD(Var_date_tmp, INTERVAL 1 MONTH); 
+  END While;
+END if;
+
+
+
+
+COMMIT;
+
+SELECT Var_anzahl AS ergebnis, Var_newID as ID;
+
+END//
 DELIMITER ;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
