@@ -199,6 +199,19 @@ if (isset($_REQUEST["jahr"])) {
     $andJahrUnion = "";
 }
 
+
+if (isset($_REQUEST["bundle"])) {
+    $bundle = $_REQUEST["bundle"];
+    if ($bundle == "null" || $bundle == "") {
+        $andBundle = "";
+    } else {
+        $aBundle = explode(",", $bundle);
+        $andBundle = " AND e.bundle in ('" . implode("','", $aBundle) . "')";
+    }
+} else {
+    $andBundle = "";
+}
+
 if (isset($_REQUEST["f"])) {
     $f = $_REQUEST["f"];
 } else {
@@ -233,6 +246,7 @@ $queryOrig = "SELECT e.ID, e.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang
         . $andZeitraum
         . $andKategorie
         . $andJahr
+        . $andBundle
         . $andZahlungsmittel;
 
 $queryUnion = " Union " // Fixkosten
@@ -255,6 +269,7 @@ $queryUnion = " Union " // Fixkosten
         . $andVorgang
         . $andHerkunft
         . $andInterval
+        . $andBundle
         . $andZahlungsmittel
         . $andZeitraumUnion
         . $andJahrUnion
@@ -344,6 +359,7 @@ if ($f != "sum") {
             . $andZeitraum
             . $andJahr
             . $andKategorie
+            . $andBundle
             . $andZahlungsmittel
             . "),0) +  IFNULL((" // Fixkosten
             . " SELECT  sum(e.betrag)
@@ -359,6 +375,7 @@ if ($f != "sum") {
             . $andVorgang
             . $andHerkunft
             . $andInterval
+            . $andBundle
             . $andZahlungsmittel
             . $andZeitraumUnion
             . $andJahrUnion

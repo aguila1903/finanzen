@@ -199,6 +199,18 @@ if (isset($_REQUEST["zahlungsmittel"])) {
     $andZahlungsmittel = "";
 }
 
+if (isset($_REQUEST["bundle"])) {
+    $bundle = $_REQUEST["bundle"];
+    if ($bundle == "null" || $bundle == "") {
+        $andBundle = "";
+    } else {
+        $aBundle = explode(",", $bundle);
+        $andBundle = " AND e.bundle in ('" . implode("','", $aBundle) . "')";
+    }
+} else {
+    $andBundle = "";
+}
+
 if (isset($_REQUEST["lookFor"])) {
     $lookFor = $_REQUEST["lookFor"];
 } else {
@@ -253,6 +265,9 @@ if ($lookFor == "herkunft") {
 if ($lookFor == "zahlungsmittel") {
     $field = "  ifnull(e.zahlungsmittel_id,0) as zahlungsmittel_id, ifnull(z.bezeichnung,'---') AS zahlungsmittel_bez, ifnull(z.bezeichnung,'---') AS sort ";
 }
+if ($lookFor == "bundle") {
+    $field = "  ifnull(e.bundle,'---') as bundle, ifnull(e.bundle,'---') AS sort ";
+}
 
 $queryOrig = "$Select$field 
  FROM einausgaben e 
@@ -270,6 +285,7 @@ $queryOrig = "$Select$field
         . $andZeitraum
         . $andKategorie
         . $andZahlungsmittel
+        . $andBundle
         . $andJahr;
 
 $queryUnion = " Union "
@@ -288,6 +304,7 @@ $queryUnion .= " from einausgaben e
         . $andVorgang
         . $andHerkunft
         . $andInterval
+        . $andBundle
         . $andZahlungsmittel
         . $andJahrUnion
         . $andZeitraumUnion
@@ -367,6 +384,9 @@ while (!$rs->EOF) {
     }
     if (isset($rs->fields['jahr'])) {
         $data[$i]["jahr"] = $rs->fields['jahr'];
+    }
+    if (isset($rs->fields['bundle'])) {
+        $data[$i]["bundle"] = $rs->fields['bundle'];
     }
     $i++;
     $rs->MoveNext();

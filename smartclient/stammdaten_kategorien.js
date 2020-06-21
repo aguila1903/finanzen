@@ -181,7 +181,8 @@ isc.DynamicForm.create({
             title: "Bezeichnung",
             width: 300,
             required: true,
-            type: "text",
+            type: "text",                        
+            keyPressFilter: "[-0-9a-zA-Z üÜäÄöÖß./_*()]",
             changed: function (form, item, value)
             {
                 changeFunction(btnSpeichernStammKategorienAdd, btnResetStammKategorienAdd, btnCloseStammKategorienAdd);
@@ -445,7 +446,8 @@ isc.DynamicForm.create({
             title: "Bezeichnung",
             width: 300,
             required: true,
-            type: "text",
+            type: "text",                       
+            keyPressFilter: "[-0-9a-zA-Z üÜäÄöÖß./_*()]",
             changed: function (form, item, value)
             {
                 changeFunction(btnSpeichernStammKategorienEdit, btnResetStammKategorienEdit, btnCloseStammKategorienEdit);

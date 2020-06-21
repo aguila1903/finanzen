@@ -35,12 +35,14 @@ function url_check($url) {
     $urlheaders = @get_headers($url);
     file_put_contents("update.txt", print_r($urlheaders, true));
     return is_array($urlheaders) ? preg_match('/^HTTP\\/\\d+\\.\\d+\\s+2\\d\\d\\s+.*$/', $urlheaders[0]) : false;
-};
+}
+
+;
 
 function updateCheck($update_logs) {
 
 
-    $update = shell_exec(PATH_GIT."git pull -f");
+    $update = shell_exec(PATH_GIT . "git pull -f");
     $date = date("Y-m-d H:i:s") . ": \n";
     if (trim($update) != "Already up to date." && $update !== null) {
         logUpdate($update_logs, "$date$update\n");
@@ -70,6 +72,7 @@ $update_logs_dir = __DIR__ . "\\log\\"; //Dateiname in dem die Logs gespeichert 
 $update_logs = __DIR__ . "\\log\\$date.sql"; //Dateiname in dem die Logs gespeichert werden
 $sql_dump = PATH_MYSQL . "mysqldump.exe";
 $sql_mysql = PATH_MYSQL . "mysql.exe";
+$db_schema = "../db_schema.sql";
 
 if (!is_dir($update_logs_dir)) {
     mkdir($update_logs_dir, 0777, true);
@@ -92,11 +95,11 @@ if (domainAvailable('https://github.com/')) {
 if (is_file($update_sql_new)) {//Es befindet sich eine Datei im sql-update Ordner
     if (is_file($sql_mysql) && is_file($sql_dump)) { // die mysql-Tools konnten gefunden werden
         //Vor dem Update: Sichern der Datenbank
-        $cmd_backup = "$sql_dump -u".DB_USER. " -p".DB_PW." ". DB_NAME . " > $backup_file --routines ";
+        $cmd_backup = "$sql_dump -u" . DB_USER . " -p" . DB_PW . " " . DB_NAME . " > $backup_file --routines ";
         $batch_backup = shell_exec($cmd_backup);
 
         //Laden der neuen Datenbank-Daten
-        $cmd_update = "$sql_mysql -u".DB_USER. " -p".DB_PW." ". DB_NAME . " --comments < $update_sql_new";
+        $cmd_update = "$sql_mysql -u" . DB_USER . " -p" . DB_PW . " " . DB_NAME . " --comments < $update_sql_new";
         $batch_update = shell_exec($cmd_update);
         logUpdate($update_logs, "DB UPDATE: $batch_update\n");
 
@@ -104,6 +107,11 @@ if (is_file($update_sql_new)) {//Es befindet sich eine Datei im sql-update Ordne
             mkdir($update_sql_old_dir, 0777, true);
         }
         rename($update_sql_new, $update_sql_old);
+
+        // Speichern des DB-Schemas
+//        $cmd_schema = "$sql_dump -u" . DB_USER . " -p" . DB_PW . " " . DB_NAME . " --no-data --routines > $db_schema";
+//        $batch_schema = shell_exec($cmd_schema);
+//        logUpdate($update_logs, "DB SCHEMA: $batch_schema\n");
     }
 }
 

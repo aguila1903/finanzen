@@ -51,6 +51,7 @@ function setCriteria()
         interval: refreshEinAusgabenListen(dfEinAusgabenFilter, "interval"),
         kategorie: refreshEinAusgabenListen(dfEinAusgabenFilter, "kategorie_id"),
         zahlungsmittel: refreshEinAusgabenListen(dfEinAusgabenFilter, "zahlungsmittel"),
+        bundle: refreshEinAusgabenListen(dfEinAusgabenFilter, "bundle"),
         count: ++dfEinAusgabenFilter.counter
     };
     return criteriaAll;
@@ -120,14 +121,18 @@ function fetchEinAusgaben(_form)
     {
         _kategorie = refreshEinAusgabenListen(dfEinAusgabenFilter, "kategorie_id");
     }
+    if (typeof (_form.getField("bundle").getDisplayValue()) !== noSearch)
+    {
+        _bundle = refreshEinAusgabenListen(dfEinAusgabenFilter, "bundle");
+    }
 
     lgEinAusgaben.fetchData({"jahr": _jahr, "monat_jahr": _monat_jahr, "enddatum": _enddatum, "art": _art, "typ": _typ, "datum": _datum,
         "konto": _kontonr, "vorgang": _vorgang, "herkunft": _herkunft, "interval": _interval,
-        "kategorie": _kategorie, zahlungsmittel: _zahlungsmittel_id, auswahl: _auswahl, counter: ++_form.counter});
-    getSumEinAusgaben(totalsLabelEinAusgaben, "api/ds/einAusgabenDS.php", _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id, _auswahl);
+        "kategorie": _kategorie, zahlungsmittel: _zahlungsmittel_id, auswahl: _auswahl, bundle: _bundle, counter: ++_form.counter});
+    getSumEinAusgaben(totalsLabelEinAusgaben, "api/ds/einAusgabenDS.php", _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id, _auswahl, _bundle);
 }
 ;
-function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id, _auswahl)
+function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _art, _typ, _datum, _kontonr, _vorgang, _herkunft, _interval, _kategorie, _zahlungsmittel_id, _auswahl, _bundle)
 {
 
     RPCManager.send("", function (rpcResponse, data, rpcRequest)
@@ -148,7 +153,7 @@ function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _
         params: {
             f: "sum", "jahr": _jahr, "monat_jahr": _monat_jahr, "enddatum": _enddatum, "art": _art, "typ": _typ, "datum": _datum,
             "konto": _kontonr, "vorgang": _vorgang, "herkunft": _herkunft, "interval": _interval, zahlungsmittel: _zahlungsmittel_id,
-            "kategorie": _kategorie, "auswahl": _auswahl
+            "kategorie": _kategorie, "auswahl": _auswahl, "bundle": _bundle
         }
     }); //Ende RPC
 
@@ -535,6 +540,10 @@ isc.DataSource.create({
         }, {
             name: "kategorie_id",
             title: "Kategorie-ID",
+            type: "text"
+        }, {
+            name: "bundle",
+            title: "Bundle-Name",
             type: "text"
         }
     ]});
@@ -987,7 +996,7 @@ isc.ListGrid.create({
             showIf: "false"
         }, {
             name: "bundle",
-            title: "Einkauf",
+            title: "Bundle-Name",
             type: "text",
             showIf: "false"
         },
@@ -1352,7 +1361,7 @@ isc.DynamicForm.create({
             }
         }, {
             name: "bundle",
-            title: "zu einem Einkauf hinzufügen",
+            title: "Positionen zu einem Bundle zusammenfassen",
             width: 300,
             required: false,
             type: "comboBox",
@@ -2389,6 +2398,65 @@ isc.DynamicForm.create({
             }, icons: [{
                     src: "famfam/delete.png",
                     name: "interval",
+                    width: 16,
+                    height: 16,
+                    prompt: "Inhalt des Feldes entfernen",
+                    hoverWidth: 300,
+                    hoverDelay: 700,
+                    click: function ()
+                    {
+                        dfEinAusgabenFilter.getField(this.name).clearValue();
+                        fetchEinAusgaben(dfEinAusgabenFilter);
+                    }
+                }]
+        }, {
+            name: "bundle",
+            type: "select",
+            multiple: true,
+            multipleAppearance: "picklist",
+            required: false,
+            hint: "Bundle",
+            title: "Bundle",
+            colSpan: 1,
+            showHintInField: true,
+            disabled: false,
+            width: dfEinAusgabenWidth,
+            showTitle: true,
+            autoFetchData: false,
+            valueField: "bundle",
+            displayField: "bundle",
+            optionDataSource: "einAusgabenSucheFelderDS",
+            pickListProperties: {
+                showShadow: false,
+                showFilterEditor: false,
+                showHeader: false
+            },
+            pickListWidth: dfEinAusgabenWidth - 5,
+            pickListFields: [{
+                    name: "bundle",
+                    width: "*"
+                }
+            ],
+            getPickListFilterCriteria: function ()
+            {
+                var criteriaAll = setCriteria();
+                var criteria = {};
+                for (var crit in criteriaAll)
+                {
+                    if (crit != this.name)
+                    {
+                        criteria[crit] = criteriaAll[crit];
+                    }
+                }
+                criteria['lookFor'] = this.name;
+                return criteria;
+            },
+            changed: function (form, item, value)
+            {
+                fetchEinAusgaben(dfEinAusgabenFilter);
+            }, icons: [{
+                    src: "famfam/delete.png",
+                    name: "bundle",
                     width: 16,
                     height: 16,
                     prompt: "Inhalt des Feldes entfernen",

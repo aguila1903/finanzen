@@ -1887,7 +1887,7 @@ isc.DynamicForm.create({
             }
         }, {
             name: "bundle",
-            title: "Einkauf",
+            title: "Positionen zu einem Bundle zusammenfassen",
             width: 300,
             required: false,
             type: "comboBox",
