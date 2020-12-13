@@ -123,7 +123,6 @@ if (move_uploaded_file(($tmp_name_array), $path . $fileName)) {
 
     $querySQL = "call kreditkarten_upload_doc (" . $ID
             . "," . $dbSyb->Quote($fileName) . ");";
-
     $rs = $dbSyb->Execute($querySQL);
 
     if (!$rs) {
@@ -143,7 +142,7 @@ if (move_uploaded_file(($tmp_name_array), $path . $fileName)) {
 
     $rs->Close();
 
-    if ($ergebnis == 1) {
+    if ($ergebnis == 1 || $ergebnis == 0) {
 
 // Alle Raten hochsetzen bevor die Karten-Vorgänge aktualisiert werden.
         $querySQL = "call raten_up (" . $dbSyb->Quote($monat) . ", " . $dbSyb->Quote($karten_nr) . ");";
@@ -166,7 +165,7 @@ if (move_uploaded_file(($tmp_name_array), $path . $fileName)) {
         }
         $rs->Close();
 
-        if ($ergebnis == 1) {
+        if ($ergebnis == 1 || $ergebnis == 0) {
 
             $fullFileName = $path . $fileName;
             $newRates = updateCreditCard($fullFileName, $dbSyb, $monat, PATH_PDFTools);

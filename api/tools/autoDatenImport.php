@@ -21,6 +21,9 @@ function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath) {
     $tmp = "tmp\\";
     $time = date("YmdHis");
     $outputfile = $tmp . "output_$time";
+    if(!is_dir($outputfile)){
+        mkdir($outputfile, 0775, true);
+    }
     $extractFile = "$tmp\\doExtract_$time.cmd";
     $pos = array();
     $datePattern = '/^[0-9]{1}[0-9]{1}\/[0-9]{1}[0-9]{1}\/[0-9]{4}/';
@@ -140,7 +143,7 @@ file_put_contents("pos.txt", print_r($raw, true));
                 . "," . $vade
                 . "," . $vadeMax
                 . "," . $zeile['tutar']
-                . "," . $dbSyb->Quote(date("mY")); //monat  
+                . "," . $dbSyb->Quote($monat); //monat  
         if ($vade == $vadeMax) {
             $querySQL .= "," . $dbSyb->Quote("E");
         } else {

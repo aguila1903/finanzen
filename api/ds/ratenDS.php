@@ -76,12 +76,11 @@ if (isset($_REQUEST["typ"])) {
             print json_encode($out);
             return;
         } else {
-            $WhereStatus = " and status = " . $dbSyb->Quote($typ);
+            $WhereStatus = ($typ == 'A') ? " and rate < max_rate " : " and rate <= max_rate";
         }
     } else {
         $WhereStatus = "";
-    }
-    $WhereStatus = " and status = " . $dbSyb->Quote($typ);
+    }    
 } else {
     $WhereStatus = "";
 }

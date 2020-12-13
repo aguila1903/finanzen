@@ -5,7 +5,7 @@ session_start();
 require_once('adodb5/adodb.inc.php');
 require_once('conf.php');
 
-$ADODB_CACHE_DIR = 'C:/php/cache';
+$ADODB_CACHE_DIR = '../tmp';
 
 
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC; // Liefert ein assoziatives Array, das der geholten Zeile entspricht 
@@ -67,7 +67,7 @@ $querySQL = " call $proc ($monat)";
 
 
 
-$rs = $dbSyb->Execute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?
+$rs = $dbSyb->cacheExecute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?
 
 $data = array();
 
