@@ -41,7 +41,7 @@ if (!$dbSyb->IsConnected()) {
 
 
 
-  $querySQL = "Select bundle as bezeichnung from einausgaben $where";
+  $querySQL = "Select distinct bundle as bezeichnung from einausgaben $where";
 //    file_put_contents("herkunft.txt", $querySQL);
 
 
