@@ -117,7 +117,7 @@ if (is_dir($path) != 1) {
     mkdir($path, 0775, true);
 }
 
-$fileName = basename(($_FILES['file']['name']));
+$fileName = cleanSpecChars(basename(($_FILES['file']['name'])));
 
 if (move_uploaded_file(($tmp_name_array), $path . $fileName)) {
 

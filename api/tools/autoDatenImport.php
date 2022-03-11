@@ -1,7 +1,8 @@
 <?php
 require_once('conf.php');
 
-function deleteTmpFiles($outputfile, $extractFile) {
+function deleteTmpFiles($outputfile, $extractFile)
+{
     if (is_file($outputfile . '.txt')) {
         unlink($outputfile . '.txt');
     }
@@ -13,7 +14,16 @@ function deleteTmpFiles($outputfile, $extractFile) {
     }
 }
 
-function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath) {
+function cleanSpecChars($string)
+{
+    $special_chars = array("ä", "Ä", "ü", "Ü", "ö", "Ö", "ß", "Ğ", "ğ", "Ş", "ş", "Ç", "ç", "İ", "ı", " ");
+    $replace_chars = array("ae", "Ae", "ue", "Ue", "oe", "Oe", "ss", "G", "g", "S", "s", "C", "c", "I", "i", "_");
+    $return = str_replace($special_chars, $replace_chars, $string);
+    return $return;
+}
+
+function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath)
+{
     date_default_timezone_set('europe/berlin');
     $logFileName = date('Y-m-d') . ".log";
     $data = array();
@@ -21,15 +31,15 @@ function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath) {
     $tmp = "tmp\\";
     $time = date("YmdHis");
     $outputfile = $tmp . "output_$time";
-    if(!is_dir($outputfile)){
-        mkdir($outputfile, 0775, true);
-    }
+//    if(!is_dir($outputfile)){
+//        mkdir($outputfile, 0775, true);
+//    }
     $extractFile = "$tmp\\doExtract_$time.cmd";
     $pos = array();
     $datePattern = '/^[0-9]{1}[0-9]{1}\/[0-9]{1}[0-9]{1}\/[0-9]{4}/';
     $hesapTarihPattern = '/[0-9]{1}[0-9]{1}\/[0-9]{1}[0-9]{1}\/[0-9]{4}/';
-    $amountPattern =    '/[0-9,-]{1,7}[.]{1}[0-9]{2}/';
-    $oedemePattern =    '/[0-9,]{1,7}[.]{1}[0-9]{2}/';
+    $amountPattern = '/[0-9,-]{1,7}[.]{1}[0-9]{2}/';
+    $oedemePattern = '/[0-9,]{1,7}[.]{1}[0-9]{2}/';
     $taksitPatternTmp = '/[0-9]{1,6}[.]{1}[0-9]{2}.*/';
     $taksitPattern = '/\b[ 1-9]{1,3}[\/]{1}[1-9]{1,3}\b/';
     $islemPattern = "/^[0-9]{1}[0-9]{1}\/[0-9]{1}[0-9]{1}\/[0-9]{4}.*[0-9]{1,6}[.]{1}[0-9]{2}/";
@@ -50,10 +60,10 @@ function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath) {
 //$fullFileName = "c:\\xampp\\htdocs\\finanzen\\api\\tools\\2019AralikEkstreniz.pdf";
 
     if (is_file($fullFileName) && is_file($PDF2Text)) {
-
         $cmdfile = '@echo off' . "\r\n";
         $cmdfile .= $PDF2Text . ' -q -raw -enc UTF-8 -eol unix -nopgbrk "' . $fullFileName . '" "' . $outputfile . '_raw.txt"' . "\r\n";
         $cmdfile .= "exit\r\n";
+//        file_put_contents("test.txt", $cmdfile);
         file_put_contents($extractFile, $cmdfile);
         $cmd = "$extractFile >NUL 2>NUL";
         $output = exec($cmd);
@@ -69,26 +79,36 @@ function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath) {
         }
     }
 
-file_put_contents("pos.txt", print_r($raw, true));
+    file_put_contents("pos.txt", print_r($raw, true));
     $i = 0;
     for ($ii = 0; $ii < count($raw); $ii++) {
 
         if (preg_match($datePattern, trim($raw[$ii]))) {
+
             preg_match($datePattern, $raw[$ii], $date);
             $pos[$ii]["datum"] = $date[0];
             preg_match($amountPattern, $raw[$ii], $amount);
-            $pos[$ii]["tutar"] = str_replace(",", "", $amount[0]);
+            $pos[$ii]["tutar"] = (isset($amount[0]) && !empty($amount[0])) ? str_replace(",", "", $amount[0]) : "";
 
             preg_match($taksitPatternTmp, $raw[$ii], $taksitTmp);
-            if (preg_match($taksitPattern, $taksitTmp[0], $taksit)) {
-                $pos[$ii]["taksit"] = $taksit[0];
-            } else {
-                $pos[$ii]["taksit"] = "1/1";
+            if(isset($taksitTmp[0]) && !empty($taksitTmp[0])){
+                if (preg_match($taksitPattern, $taksitTmp[0], $taksit)) {
+                    $pos[$ii]["taksit"] = $taksit[0];
+                } else {
+                    $pos[$ii]["taksit"] = "1/1";
+                }
+            }else{
+                $pos[$ii]["taksit"] = "";
             }
+
             preg_match($islemPattern, $raw[$ii], $regsMk);
-            $replDate = preg_replace($datePattern, "", $regsMk[0]);
-            $replAmount = preg_replace($amountPattern, "", $replDate);
-            $pos[$ii]["islem"] = trim($replAmount);
+            if(isset($regsMk[0]) && !empty($regsMk[0])){
+                $replDate = preg_replace($datePattern, "", $regsMk[0]);
+                $replAmount = preg_replace($amountPattern, "", $replDate);
+                $pos[$ii]["islem"] = trim($replAmount);
+            }else{
+                $pos[$ii]["islem"] = "";
+            }
 
             $taksitArr = explode("/", $pos[$ii]['taksit']);
             if ($taksitArr[0] == "1" && !preg_match("/Ödeme - Tesekkür/", $pos[$ii]['islem'])) {
@@ -97,7 +117,7 @@ file_put_contents("pos.txt", print_r($raw, true));
             }
             if (preg_match("/Ödeme - Tesekkür/", $pos[$ii]['islem'])) {
                 preg_match($oedemePattern, $raw[$ii], $oedemeArr);
-                $oedeme = (is_array($oedemeArr) && !empty($oedemeArr[0])) ? str_replace(",", "", $oedemeArr[0])+ str_replace(",", "", $oedeme) : $oedeme;
+                $oedeme = (is_array($oedemeArr) && !empty($oedemeArr[0])) ? str_replace(",", "", $oedemeArr[0]) + str_replace(",", "", $oedeme) : $oedeme;
             }
         }
         if (preg_match("/Hesap Kesim Tarihi/", $raw[$ii])) {
@@ -115,7 +135,7 @@ file_put_contents("pos.txt", print_r($raw, true));
     }
 
     deleteTmpFiles($outputfile, $extractFile);
-    $metadaten = array('oedeme' => str_replace(".", ",",$oedeme), 'asgari' => str_replace(".", ",",$asgari), 'doenemborcu' => str_replace(".", ",",$doenemBorcu), 'hesaptarih' => $hesapTarih);
+    $metadaten = array('oedeme' => str_replace(".", ",", $oedeme), 'asgari' => str_replace(".", ",", $asgari), 'doenemborcu' => str_replace(".", ",", $doenemBorcu), 'hesaptarih' => $hesapTarih);
 //    file_put_contents("metaDaten.txt", "$oedeme, $asgari, $doenemBorcu, $hesapTarih");
 
     $ii = 0;
@@ -136,14 +156,14 @@ file_put_contents("pos.txt", print_r($raw, true));
         $datum = explode("/", $zeile['datum']);
 
         $querySQL = " insert into kk_raten (karten_nr, vorgang, rate, max_rate, betrag, monat, status, comment, datum) "
-                . " values "
-                . "("
-                . $dbSyb->Quote("CAFI")
-                . "," . $dbSyb->Quote(($zeile['islem'])) //islem    
-                . "," . $vade
-                . "," . $vadeMax
-                . "," . $zeile['tutar']
-                . "," . $dbSyb->Quote($monat); //monat  
+            . " values "
+            . "("
+            . $dbSyb->Quote("CAFI")
+            . "," . $dbSyb->Quote(($zeile['islem'])) //islem
+            . "," . $vade
+            . "," . $vadeMax
+            . "," . $zeile['tutar']
+            . "," . $dbSyb->Quote($monat); //monat
         if ($vade == $vadeMax) {
             $querySQL .= "," . $dbSyb->Quote("E");
         } else {
@@ -151,8 +171,8 @@ file_put_contents("pos.txt", print_r($raw, true));
         }
         //status
         $querySQL .= ", NULL "   //comment
-                . "," . $dbSyb->Quote($datum[2] . $datum[1] . $datum[0]) //islem tarihi
-                . ")";
+            . "," . $dbSyb->Quote($datum[2] . $datum[1] . $datum[0]) //islem tarihi
+            . ")";
 
         file_put_contents($tmp . "query_$monat.sql", $time . " -" . $querySQL . "\n", FILE_APPEND);
 
@@ -171,6 +191,6 @@ file_put_contents("pos.txt", print_r($raw, true));
     }
     $ergebnis['newrates'] = $newRates;
     $ergebnis['metadaten'] = $metadaten;
-    
+
     return $ergebnis;
 }

@@ -68,14 +68,15 @@ else {
     $differenz = 0;
 
     while (!$rs->EOF) {
-
+        $zahlung = floatval($rs->fields["zahlung"]);
+        $mind_zahlung = floatval($rs->fields["mind_zahlung"]);
         $data[$i]["ID"] = $rs->fields["ID"];
         $data[$i]["datum2"] = str_replace('.', '-', $rs->fields["datum2"]);
         $data[$i]["karten_nr"] = ($rs->fields["karten_nr"]);
         $data[$i]["bezeichnung"] = ($rs->fields["bezeichnung"]);
         $wechselkurs = getHistEx($data[$i]["datum2"]);
         $data[$i]["betrag"] = number_format($rs->fields["betrag"], 2, ',', '.') . " (" . number_format($rs->fields["betrag"] / $wechselkurs, 2, ',', '.') . ")";
-        $data[$i]["zahlung"] = number_format($rs->fields["zahlung"], 2, ',', '.') . " (" . number_format($rs->fields["zahlung"] / $wechselkurs, 2, ',', '.') . ")";
+        $data[$i]["zahlung"] = number_format($zahlung, 2, ',', '.') . " (" . number_format($zahlung / $wechselkurs, 2, ',', '.') . ")";
         $data[$i]["vor_monat"] = number_format($rs->fields["vor_monat"], 2, ',', '.') . " (" . number_format($rs->fields["vor_monat"] / $wechselkurs, 2, ',', '.') . ")";
         $data[$i]["betrag_"] = $rs->fields["betrag"];
         $differenz = $rs->fields["vor_monat"] - $rs->fields["betrag"];
@@ -83,7 +84,7 @@ else {
         $data[$i]["differenz_noNumber"] = $differenz;
         $data[$i]["vor_monat_"] = $rs->fields["vor_monat"];
         $data[$i]["datum"] = $rs->fields["datum"];
-        $data[$i]["mind_zahlung"] = number_format($rs->fields["mind_zahlung"], 2, ',', '.') . " (" . number_format($rs->fields["mind_zahlung"] / $wechselkurs, 2, ',', '.') . ")";
+        $data[$i]["mind_zahlung"] = number_format($mind_zahlung, 2, ',', '.') . " (" . number_format($mind_zahlung / $wechselkurs, 2, ',', '.') . ")";
         $data[$i]["monat"] = $rs->fields["Monat"];
         $data[$i]["pdf"] = ($rs->fields["pdf"]);
 
@@ -123,6 +124,6 @@ else {
     $out["response"]["errors"] = array();
     $out["response"]["data"] = $data;
 
-    print json_encode($out);
+    die(json_encode($out));
 }
 ?>

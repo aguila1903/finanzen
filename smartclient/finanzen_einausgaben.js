@@ -197,8 +197,8 @@ function uploadDocEinAusgabe(_this, id)
         // Add the button to the file preview element.
         file.previewElement.appendChild(removeButtonEinAusg);
     });
-}
-;
+};
+
 function initDropZoneEinAusgabe()
 {
 
