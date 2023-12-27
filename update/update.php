@@ -19,7 +19,7 @@ function domainAvailable($strDomain) {
     curl_setopt($rCurlHandle, CURLOPT_HEADER, TRUE);
     curl_setopt($rCurlHandle, CURLOPT_NOBODY, TRUE);
     curl_setopt($rCurlHandle, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($rCurlHandle,CURLOPT_SSL_VERIFYPEER, true);
+    curl_setopt($rCurlHandle,CURLOPT_SSL_VERIFYPEER, false);
 
     $strResponse = curl_exec($rCurlHandle);
 //    file_put_contents("update.txt", print_r($rCurlHandle, true));
