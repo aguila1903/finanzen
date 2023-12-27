@@ -51,8 +51,8 @@ function setCriteria()
         interval: refreshEinAusgabenListen(dfEinAusgabenFilter, "interval"),
         kategorie: refreshEinAusgabenListen(dfEinAusgabenFilter, "kategorie_id"),
         zahlungsmittel: refreshEinAusgabenListen(dfEinAusgabenFilter, "zahlungsmittel"),
-        bundle: refreshEinAusgabenListen(dfEinAusgabenFilter, "bundle"),
-        count: ++dfEinAusgabenFilter.counter
+        bundle: refreshEinAusgabenListen(dfEinAusgabenFilter, "bundle")
+        // count: ++dfEinAusgabenFilter.counter
     };
     return criteriaAll;
 }
@@ -1119,7 +1119,7 @@ isc.DynamicForm.create({
             type: "select",
             changed: function (form, item, value)
             {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
+                changeFunction(btnSpeichernEinAusgabe, btnResetEinAusgabe, btnCloseEinAusgabe);
             }
         }, {
             name: "kategorie_id",
@@ -1774,6 +1774,8 @@ isc.DynamicForm.create({
             ],
             getPickListFilterCriteria: function ()
             {
+                // val = dfEinAusgabenFilter.getField("monat_jahr").getValue();
+                // dfEinAusgabenFilter.getField(this.name).clearValue();
                 var criteriaAll = setCriteria();
                 var criteria = {};
                 for (var crit in criteriaAll)

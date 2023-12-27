@@ -282,7 +282,7 @@ if ($f != "sum") {
         $querySQL = $queryOrig;
     }
 
-    file_put_contents("einAusgabeDS.txt", $querySQL);
+//    file_put_contents("einAusgabeDS.txt", $querySQL);
 
     $rs = $dbSyb->Execute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?
 // Ausgabe initialisieren
@@ -361,7 +361,7 @@ if ($f != "sum") {
             . $andKategorie
             . $andBundle
             . $andZahlungsmittel
-            . "),0) +  IFNULL((" // Fixkosten
+            . "),0) /* +  IFNULL((" // Fixkosten
             . " SELECT  sum(e.betrag)
   from einausgaben e 
   JOIN kategorien ka on e.kategorie_id = ka.ID
@@ -380,7 +380,7 @@ if ($f != "sum") {
             . $andZeitraumUnion
             . $andJahrUnion
             . $andKategorie
-            . "),0) as summe";
+            . "),0) */ as summe";
 
     file_put_contents("einAusgabenSummen.txt", $querySQL);
     /* @var $rs string */

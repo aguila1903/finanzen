@@ -934,26 +934,14 @@ var typeMenu = {
         {title: "Email", keyTitle: "Ctrl+E", icon: "icons/16/disk_blue.png"}
     ]
 };
-function getIconButton(title, props)
-{
-    return isc.IconButton.create(isc.addProperties({
-        title: title,
-        icon: "pieces/16/cube_blue.png",
-        largeIcon: "pieces/48/cube_blue.png",
-        click: "isc.say(this.title + ' button clicked');"
-    }, props)
-      );
-}
-
-function getIconMenuButton(title, props)
-{
-    return isc.IconMenuButton.create(isc.addProperties({
-        title: title,
-        icon: "pieces/16/piece_blue.png",
-        largeIcon: "pieces/48/piece_blue.png",
-        click: "isc.say(this.title + ' button clicked');"
-    }, props)
-      );
+function getRibbonButton (title, props) {
+    return isc.RibbonButton.create(isc.addProperties({
+            title: title,
+            icon: "pieces/16/cube_blue.png",
+            largeIcon: "pieces/48/cube_blue.png",
+            click: "isc.say(this.title + ' button clicked');"
+        }, props)
+    );
 }
 
 isc.RibbonGroup.create({
@@ -963,7 +951,7 @@ isc.RibbonGroup.create({
     rowHeight: 26,
 //    colWidths: [10, 10, "*"],
     controls: [
-        getIconButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Logout</text>',
+        getRibbonButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Logout</text>',
           {orientation: "vertical", align: "center", colSpan: 2, largeIcon: "icons/new/logout.png", click: "tsbLogout.action()"})
 
     ],
@@ -976,7 +964,7 @@ isc.RibbonGroup.create({
     rowHeight: 26,
 //    colWidths: [10, 10, "*"],
     controls: [
-        getIconButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;"><center>User: ' + user + '</center></text> ',
+        getRibbonButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;"><center>User: ' + user + '</center></text> ',
           {orientation: "vertical", align: "center", colSpan: 2, largeIcon: "web/32/user_suit.png", click: function ()
               {}
           })
@@ -991,7 +979,7 @@ isc.RibbonGroup.create({
     rowHeight: 26,
 //    colWidths: [10, 10, "*"],
     controls: [
-        getIconButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Sichern</text>',
+        getRibbonButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Sichern</text>',
           {orientation: "vertical", align: "center", colSpan: 2, largeIcon: "icons/new/save.png",
               prompt: "Erstellt ein Backup der gesamten Datenbank workflow_wf und workflow_rb.",
               click: function ()
@@ -1032,7 +1020,7 @@ isc.RibbonGroup.create({
     rowHeight: 26,
 //    colWidths: [10, 10, "*"],
     controls: [
-        getIconButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Laden</text>',
+        getRibbonButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Laden</text>',
           {orientation: "vertical", align: "center", colSpan: 2, largeIcon: "web/32/folder_database.png", click: function ()
               {
                   loadGroup.count++;
@@ -1052,7 +1040,7 @@ isc.RibbonGroup.create({
     rowHeight: 26,
 //    colWidths: [10, 10, "*"],
     controls: [
-        getIconButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Update</text>',
+        getRibbonButton('<text style="color:' + userFontColor + '; font-size:' + userFontSize + '; font-family:' + userFontFamily + '; text-decoration:none;">Update</text>',
           {orientation: "vertical", align: "center", colSpan: 2, largeIcon: "web/32/update.png", click: function ()
               {
                   doUpdate("menu");

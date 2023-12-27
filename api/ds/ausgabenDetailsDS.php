@@ -87,6 +87,7 @@ else {
         $data[$i]["buchtext"] = ($rs->fields['buchungstext']);
         $data[$i]["kontonr"] = ($rs->fields['kontonr']);
         $data[$i]["einausgaben_id"] = ($rs->fields['einausgaben_id']);
+        $data[$i]["kategorie"] = ($rs->fields['kategorie']);
 //        $data[$i]["extern"] = ($rs->fields['extern']);  
 
         if ($rs->fields['betrag'] > 0) {
@@ -108,6 +109,9 @@ else {
             } else {
                 $data[$i]["ref"] = "error";
             }
+        }
+        if($data[$i]["ref"] != "error" && empty($data[$i]["kategorie"])){
+            $data[$i]["kategorie"] = '---';
         }
 
         $i++;

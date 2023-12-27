@@ -20,8 +20,7 @@ id_ald = 0;
  * =============================================================================
  */
 
-var onRefresh = function (_listgrid, param)
-{
+var onRefresh = function (_listgrid, param) {
 
 
     var dataSource = Canvas.getById(_listgrid).getDataSource();
@@ -30,12 +29,12 @@ var onRefresh = function (_listgrid, param)
         endRow: (Canvas.getById(_listgrid).getVisibleRows()[1] + Canvas.getById(_listgrid).data.resultSize),
         sortBy: Canvas.getById(_listgrid).getSort(),
         showPrompt: false,
-        params: {giroSpar: param
+        params: {
+            giroSpar: param
 
         }
     };
-    var callback = function (dsResponse, data, dsRequest)
-    {
+    var callback = function (dsResponse, data, dsRequest) {
         var resultSet = isc.ResultSet.create({
             dataSource: Canvas.getById(_listgrid).getDataSource(),
             initialLength: dsResponse.totalRows,
@@ -48,22 +47,17 @@ var onRefresh = function (_listgrid, param)
 
 };
 
-var findRecord = function (_listgrid, ID)
-{
+var findRecord = function (_listgrid, ID) {
     var cnt = 0;
-    if (cnt <= 10)
-    {
-        if (!Array.isLoading(_listgrid.getRecord(0)))
-        {
+    if (cnt <= 10) {
+        if (!Array.isLoading(_listgrid.getRecord(0))) {
             var ds1 = _listgrid.data.find("ID", ID);
             var index1 = _listgrid.getRecordIndex(ds1);
             _listgrid.selectRecord(index1);
             _listgrid.scrollToRow(index1);
-        } else
-        {
+        } else {
             cnt++;
-            isc.Timer.setTimeout(function ()
-            {
+            isc.Timer.setTimeout(function () {
                 findRecord(_listgrid, ID);
             }, 500);
             console.log(cnt);
@@ -72,25 +66,20 @@ var findRecord = function (_listgrid, ID)
 };
 
 
-function uploadDocUmsaetze(_this)
-{ // Dokument in der Dropzone wird hochgeladen
+function uploadDocUmsaetze(_this) { // Dokument in der Dropzone wird hochgeladen
 
-    _this.on("success", function (file, res)
-    {
+    _this.on("success", function (file, res) {
 //        var dateiname = file.name.replace(/.csv/gi, ".UEB");
         response = JSON.parse(res);
         try {
-            if (!Array.isArray(response) && response.substr(0, 6) == "Error:")
-            {
+            if (!Array.isArray(response) && response.substr(0, 6) == "Error:") {
                 isc.say(response);
                 _this.removeFile(file);
                 var res = response.split(" - ");
-                if (res.length > 1)
-                {
+                if (res.length > 1) {
 //                    delDocument("input_" + res[1] + ".pdf");
                 }
-            } else
-            {
+            } else {
                 AusgabenListe.invalidateCache();
 //                isc.say(response);
                 htmlPaneDropZoneUmsaetzeResluts.setContents(response);
@@ -105,29 +94,24 @@ function uploadDocUmsaetze(_this)
 }
 ;
 
-function initDropZoneUmsaetze()
-{
+function initDropZoneUmsaetze() {
 
-    this.on("sending", function (file, xhr, formData)
-    { // zusätzlich den mandanten mitschicken
+    this.on("sending", function (file, xhr, formData) { // zusätzlich den mandanten mitschicken
 //            var mandant = dfFibuAvise.getField("mandant").getValue();
 //            formData.append("mandant", mandant);
     });
     removeButtonUmsaetze = Dropzone.createElement("<button class='remove-button'>Leeren</button>");
-    this.on("drop", function (e)
-    {
+    this.on("drop", function (e) {
         e.preventDefault();
         e.stopPropagation();
         uploadDocUmsaetze(this);
     });
-    this.on("addedfile", function (file)
-    {
+    this.on("addedfile", function (file) {
         uploadDocUmsaetze(this);
     });
 
     // Maximal nur 1 Datei erlaubt (maxFiles: 1 - dropzone.js) - Alles andere wird automatisch entfernt (Thumbnails)
-    this.on("maxfilesexceeded", function (file)
-    {
+    this.on("maxfilesexceeded", function (file) {
         this.removeFile(file);
         // Add the button to the file preview element.
         file.previewElement.appendChild(removeButtonUmsaetze);
@@ -135,8 +119,7 @@ function initDropZoneUmsaetze()
 
     _thisUms = this;
     // Listen to the click event
-    removeButtonUmsaetze.addEventListener("click", function (e)
-    {
+    removeButtonUmsaetze.addEventListener("click", function (e) {
 
         // Make sure the button click doesn't submit the form:
         e.preventDefault();
@@ -152,8 +135,7 @@ function initDropZoneUmsaetze()
 
     });
 
-    this.on("error", function (file, res)
-    {
+    this.on("error", function (file, res) {
         isc.say(res);
         // Add the button to the file preview element.
         file.previewElement.appendChild(removeButtonUmsaetze);
@@ -161,32 +143,26 @@ function initDropZoneUmsaetze()
 }
 ;
 
-function setUmsatzStatus(status_)
-{
+function setUmsatzStatus(status_) {
     id_al = AusgabenListe.getSelectedRecord().ID;
     id_ald = AusgabenListeDetails.getSelectedRecord().ID;
-    RPCManager.send("", function (rpcResponse, data, rpcRequest)
-    {
+    RPCManager.send("", function (rpcResponse, data, rpcRequest) {
         var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
 
-        if (_data.response.status === 0)
-        {  // Status 0 bedeutet Keine Fehler
+        if (_data.response.status === 0) {  // Status 0 bedeutet Keine Fehler
 
 //                        AusgabenListeDetails.invalidateCache();
             AusgabenListe.invalidateCache();
             findRecord(AusgabenListe, id_al);
-            isc.Timer.setTimeout(function ()
-            {
+            isc.Timer.setTimeout(function () {
                 findRecord(AusgabenListeDetails, id_ald);
             }, 500);
 
-        } else
-        { // Wenn die Validierungen Fehler aufweisen dann:
+        } else { // Wenn die Validierungen Fehler aufweisen dann:
 
             dfKategorien.setErrors(_data.response.errors, true);
             var _errors = dfKategorien.getErrors();
-            for (var i in _errors)
-            {
+            for (var i in _errors) {
                 isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>");
             }
 
@@ -214,21 +190,19 @@ isc.DataSource.create({
     // serverType:"sql",
     dataFormat: "json",
     operationBindings: [
-        {operationType: "fetch",
+        {
+            operationType: "fetch",
             dataURL: "api/ds/ausgabenDS.php"
         }
-    ], transformResponse: function (dsResponse, dsRequest, jsonData)
-    {
+    ], transformResponse: function (dsResponse, dsRequest, jsonData) {
         var status = isc.XMLTools.selectObjects(jsonData, "/response/status");
         var data = isc.XMLTools.selectObjects(jsonData, "/response/data");
         dsResponse.data = data;
-        if (status != 0)
-        {
+        if (status != 0) {
             dsResponse.status = isc.RPCResponse.STATUS_VALIDATION_ERROR; // setzt das Format {[feld] : '[fehlermeldung]'} voraus!
             var errors = isc.XMLTools.selectObjects(jsonData, "/response/errors");
             dsResponse.errors = errors;
-        } else
-        {
+        } else {
             dsResponse.startRow = 0; // bei Datasource immer von 1 bis n
             dsResponse.endRow = data.length - 1; // -- kÃ¶nnte auch in der Response stehen!
             dsResponse.totalRows = data.length; // Anzahl der Zeilen
@@ -257,7 +231,8 @@ isc.DataSource.create({
             name: "differenz",
             type: "text"
         }
-    ]});
+    ]
+});
 
 isc.DataSource.create({
     ID: "ausgabenDetailsDS",
@@ -265,7 +240,8 @@ isc.DataSource.create({
     // serverType:"sql",
     dataFormat: "json",
     operationBindings: [
-        {operationType: "fetch",
+        {
+            operationType: "fetch",
             dataURL: "api/ds/ausgabenDetailsDS.php"
         }
     ]/*, transformResponse: function (dsResponse, dsRequest, jsonData)
@@ -320,8 +296,12 @@ isc.DataSource.create({
         }, {
             name: "ref",
             type: "text"
+        }, {
+            name: "kategorie",
+            type: "text"
         }
-    ]});
+    ]
+});
 
 isc.DataSource.create({
     ID: "kontenDS",
@@ -329,21 +309,19 @@ isc.DataSource.create({
     // serverType:"sql",
     dataFormat: "json",
     operationBindings: [
-        {operationType: "fetch",
+        {
+            operationType: "fetch",
             dataURL: "api/ds/kontenDS.php"
         }
-    ], transformResponse: function (dsResponse, dsRequest, jsonData)
-    {
+    ], transformResponse: function (dsResponse, dsRequest, jsonData) {
         var status = isc.XMLTools.selectObjects(jsonData, "/response/status");
         var data = isc.XMLTools.selectObjects(jsonData, "/response/data");
         dsResponse.data = data;
-        if (status != 0)
-        {
+        if (status != 0) {
             dsResponse.status = isc.RPCResponse.STATUS_VALIDATION_ERROR; // setzt das Format {[feld] : '[fehlermeldung]'} voraus!
             var errors = isc.XMLTools.selectObjects(jsonData, "/response/errors");
             dsResponse.errors = errors;
-        } else
-        {
+        } else {
             dsResponse.startRow = 0; // bei Datasource immer von 1 bis n
             dsResponse.endRow = data.length - 1; // -- kÃ¶nnte auch in der Response stehen!
             dsResponse.totalRows = data.length; // Anzahl der Zeilen
@@ -365,7 +343,8 @@ isc.DataSource.create({
             title: "Bezeichnung",
             type: "text"
         }
-    ]});
+    ]
+});
 
 
 isc.DataSource.create({
@@ -374,21 +353,19 @@ isc.DataSource.create({
     // serverType:"sql",
     dataFormat: "json",
     operationBindings: [
-        {operationType: "fetch",
+        {
+            operationType: "fetch",
             dataURL: "api/ds/zahlmittelDS.php"
         }
-    ], transformResponse: function (dsResponse, dsRequest, jsonData)
-    {
+    ], transformResponse: function (dsResponse, dsRequest, jsonData) {
         var status = isc.XMLTools.selectObjects(jsonData, "/response/status");
         var data = isc.XMLTools.selectObjects(jsonData, "/response/data");
         dsResponse.data = data;
-        if (status != 0)
-        {
+        if (status != 0) {
             dsResponse.status = isc.RPCResponse.STATUS_VALIDATION_ERROR; // setzt das Format {[feld] : '[fehlermeldung]'} voraus!
             var errors = isc.XMLTools.selectObjects(jsonData, "/response/errors");
             dsResponse.errors = errors;
-        } else
-        {
+        } else {
             dsResponse.startRow = 0; // bei Datasource immer von 1 bis n
             dsResponse.endRow = data.length - 1; // -- kÃ¶nnte auch in der Response stehen!
             dsResponse.totalRows = data.length; // Anzahl der Zeilen
@@ -406,7 +383,8 @@ isc.DataSource.create({
             title: "Bezeichnung",
             type: "text"
         }
-    ]});
+    ]
+});
 
 
 isc.DataSource.create({
@@ -415,21 +393,19 @@ isc.DataSource.create({
     // serverType:"sql",
     dataFormat: "json",
     operationBindings: [
-        {operationType: "fetch",
+        {
+            operationType: "fetch",
             dataURL: "api/ds/kategorienDS.php"
         }
-    ], transformResponse: function (dsResponse, dsRequest, jsonData)
-    {
+    ], transformResponse: function (dsResponse, dsRequest, jsonData) {
         var status = isc.XMLTools.selectObjects(jsonData, "/response/status");
         var data = isc.XMLTools.selectObjects(jsonData, "/response/data");
         dsResponse.data = data;
-        if (status != 0)
-        {
+        if (status != 0) {
             dsResponse.status = isc.RPCResponse.STATUS_VALIDATION_ERROR; // setzt das Format {[feld] : '[fehlermeldung]'} voraus!
             var errors = isc.XMLTools.selectObjects(jsonData, "/response/errors");
             dsResponse.errors = errors;
-        } else
-        {
+        } else {
             dsResponse.startRow = 0; // bei Datasource immer von 1 bis n
             dsResponse.endRow = data.length - 1; // -- kÃ¶nnte auch in der Response stehen!
             dsResponse.totalRows = data.length; // Anzahl der Zeilen
@@ -447,7 +423,8 @@ isc.DataSource.create({
             title: "Bezeichnung",
             type: "text"
         }
-    ]});
+    ]
+});
 
 
 isc.DataSource.create({
@@ -456,21 +433,19 @@ isc.DataSource.create({
     // serverType:"sql",
     dataFormat: "json",
     operationBindings: [
-        {operationType: "fetch",
+        {
+            operationType: "fetch",
             dataURL: "api/ds/herkunftVorgangDS.php"
         }
-    ], transformResponse: function (dsResponse, dsRequest, jsonData)
-    {
+    ], transformResponse: function (dsResponse, dsRequest, jsonData) {
         var status = isc.XMLTools.selectObjects(jsonData, "/response/status");
         var data = isc.XMLTools.selectObjects(jsonData, "/response/data");
         dsResponse.data = data;
-        if (status != 0)
-        {
+        if (status != 0) {
             dsResponse.status = isc.RPCResponse.STATUS_VALIDATION_ERROR; // setzt das Format {[feld] : '[fehlermeldung]'} voraus!
             var errors = isc.XMLTools.selectObjects(jsonData, "/response/errors");
             dsResponse.errors = errors;
-        } else
-        {
+        } else {
             dsResponse.startRow = 0; // bei Datasource immer von 1 bis n
             dsResponse.endRow = data.length - 1; // -- kÃ¶nnte auch in der Response stehen!
             dsResponse.totalRows = data.length; // Anzahl der Zeilen
@@ -488,7 +463,8 @@ isc.DataSource.create({
             title: "Bezeichnung",
             type: "text"
         }
-    ]});
+    ]
+});
 
 isc.DataSource.create({
     ID: "bundleUmsDS",
@@ -496,21 +472,19 @@ isc.DataSource.create({
     // serverType:"sql",
     dataFormat: "json",
     operationBindings: [
-        {operationType: "fetch",
+        {
+            operationType: "fetch",
             dataURL: "api/ds/bundleDS.php"
         }
-    ], transformResponse: function (dsResponse, dsRequest, jsonData)
-    {
+    ], transformResponse: function (dsResponse, dsRequest, jsonData) {
         var status = isc.XMLTools.selectObjects(jsonData, "/response/status");
         var data = isc.XMLTools.selectObjects(jsonData, "/response/data");
         dsResponse.data = data;
-        if (status != 0)
-        {
+        if (status != 0) {
             dsResponse.status = isc.RPCResponse.STATUS_VALIDATION_ERROR; // setzt das Format {[feld] : '[fehlermeldung]'} voraus!
             var errors = isc.XMLTools.selectObjects(jsonData, "/response/errors");
             dsResponse.errors = errors;
-        } else
-        {
+        } else {
             dsResponse.startRow = 0; // bei Datasource immer von 1 bis n
             dsResponse.endRow = data.length - 1; // -- kÃ¶nnte auch in der Response stehen!
             dsResponse.totalRows = data.length; // Anzahl der Zeilen
@@ -528,13 +502,13 @@ isc.DataSource.create({
             title: "Bezeichnung",
             type: "text"
         }
-    ]});
+    ]
+});
 
 /*
  * ******************** GoTo: DropZone *************************
  * -------------------------------------------------------------
  */
-
 
 
 isc.HTMLPane.create({
@@ -576,7 +550,7 @@ isc.HTMLPane.create({
 //    backgroundColor: "grey",
     styleName: "exampleTextBlock",
     contents: '<div id="dropzone"><form class="dropzone needsclick" id="dropZoneUmsaetze"> ' +
-      '</form></div>'
+        '</form></div>'
 });
 
 Dropzone.options.dropZoneUmsaetze = {
@@ -596,7 +570,6 @@ Dropzone.options.dropZoneUmsaetze = {
  */
 
 
-
 /*
  * ***************************** GoTo: Listen ************************************
  ---------------------------------------------------------------------------------
@@ -608,26 +581,28 @@ Dropzone.options.dropZoneUmsaetze = {
  * ------------------------------------------------------------------------------
  */
 var AusgabenListeHilites =
-  [
-      {fieldName: "differenz",
-          criteria: {
-              fieldName: "differenz",
-              operator: "greaterThan",
-              value: 0
-          },
-          cssText: "color:green",
-          id: 0
-      },
-      {fieldName: "differenz",
-          criteria: {
-              fieldName: "differenz",
-              operator: "lessThan",
-              value: 0
-          },
-          cssText: "color:red",
-          id: 1
-      }
-  ];
+    [
+        {
+            fieldName: "differenz",
+            criteria: {
+                fieldName: "differenz",
+                operator: "greaterThan",
+                value: 0
+            },
+            cssText: "color:green",
+            id: 0
+        },
+        {
+            fieldName: "differenz",
+            criteria: {
+                fieldName: "differenz",
+                operator: "lessThan",
+                value: 0
+            },
+            cssText: "color:red",
+            id: 1
+        }
+    ];
 isc.ListGrid.create({
     ID: "AusgabenListe",
     count: 0,
@@ -667,16 +642,18 @@ isc.ListGrid.create({
             align: "right"
         }
     ], hilites: AusgabenListeHilites,
-    selectionChanged: function (record, state)
-    {
+    selectionChanged: function (record, state) {
 
-        AusgabenListeDetails.fetchData({monat: record.monat, giroSpar: dfKonten.getField("kontonr").getValue(), count: ++AusgabenListe.count});
+        AusgabenListeDetails.fetchData({
+            monat: record.monat,
+            giroSpar: dfKonten.getField("kontonr").getValue(),
+            count: ++AusgabenListe.count
+        });
         AusgabenListeDetails.getSum(record.monat);
 
     }/*, recordClick: function (record) {
      AusgabenListeDetails.fetchData({monat: record.monat, giroSpar: dfKonten.getField("kontonr").getValue(), count: ++AusgabenListe.count});
-     }*/, dataArrived: function ()
-    {
+     }*/, dataArrived: function () {
 //        AusgabenListe.selectRecord(0);
     }
 });
@@ -707,26 +684,28 @@ isc.ToolStrip.create({
  */
 iHTML = isc.Canvas.imgHTML("icons/16/message.png") + " ";
 var hiliteArray =
-  [
-      {fieldName: "betrag",
-          criteria: {
-              fieldName: "betrag",
-              operator: "greaterThan",
-              value: 0
-          },
-          cssText: "color:green",
-          id: 0
-      },
-      {fieldName: "betrag",
-          criteria: {
-              fieldName: "betrag",
-              operator: "lessThan",
-              value: 0
-          },
-          cssText: "color:red",
-          id: 1
-      }
-  ];
+    [
+        {
+            fieldName: "betrag",
+            criteria: {
+                fieldName: "betrag",
+                operator: "greaterThan",
+                value: 0
+            },
+            cssText: "color:green",
+            id: 0
+        },
+        {
+            fieldName: "betrag",
+            criteria: {
+                fieldName: "betrag",
+                operator: "lessThan",
+                value: 0
+            },
+            cssText: "color:red",
+            id: 1
+        }
+    ];
 isc.ListGrid.create({
     ID: "AusgabenListeDetails",
     //   header: "Daten bearbeiten",
@@ -738,7 +717,7 @@ isc.ListGrid.create({
     filterOnKeypress: true,
 //    baseStyle: "myOtherGridCell",
     fetchDelay: 500,
-    selectionType: "single",
+    selectionType: "multiple",
     showAllRecords: true,
     canExpandRecords: false,
     expansionMode: "details",
@@ -768,10 +747,8 @@ isc.ListGrid.create({
 //            showGridSummary: true, showGroupSummary: true,
 //            recordSummaryFunction: "multiplier",
 //            summaryFunction: "sum",
-            formatCellValue: function (value)
-            {
-                if (isc.isA.Number(value))
-                {
+            formatCellValue: function (value) {
+                if (isc.isA.Number(value)) {
                     return value.toLocalizedString();
                 }
                 return value;
@@ -790,11 +767,14 @@ isc.ListGrid.create({
             name: "herkunft",
             width: 350,
             title: "Herkunft"
+        }, {
+            name: "kategorie",
+            width: 350,
+            title: "Kategorie"
         }
     ],
     gridComponents: ["filterEditor", "header", "body", gridEditControls/*, "summaryRow"*/],
-    getSum: function (/*monat*/)
-    {
+    getSum: function (/*monat*/) {
 //        RPCManager.send("", function (rpcResponse, data, rpcRequest)
 //        {
 //            var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
@@ -825,8 +805,7 @@ isc.ListGrid.create({
         var laenge = aData.length;
         var summe = 0;
         var betrag = 0;
-        for (i = 0; i < laenge; i++)
-        {
+        for (i = 0; i < laenge; i++) {
             betrag = aData[i].betrag;
             betrag = betrag.replace(/\./g, "");
             betrag = betrag.replace(/,/g, ".");
@@ -837,19 +816,15 @@ isc.ListGrid.create({
         var labelContent = '<table><tr style="width:100%; color:' + gridComponentsLabelColor + '; font-size:' + gridComponentsLabelFontSize + '; font-family:' + gridComponentsLabelFontFamily + '; text-decoration:none;"><td width="200">' + summe.toLocalizedString(2, ',', '.', '-') + " €" + '</td><td width="80%"></td><td width="300" align="right">' + totalRows + ' Vorgänge</td></tr></table>';
         totalsLabel.setContents(labelContent);
 
-    }, recordDoubleClick: function (viewer, record, recordNum, field, fieldNum, value, rawValue)
-    {
+    }, recordDoubleClick: function (viewer, record, recordNum, field, fieldNum, value, rawValue) {
         wdUmsaetzeEdit.show();
         dfUmsaetzeEdit.editRecord(record);
-        if (record.betrag.substr(0, 1) == "-")
-        {
+        if (record.betrag.substr(0, 1) == "-") {
             setValue2Field(dfKategorien, 'art', "A");
-        } else
-        {
+        } else {
             setValue2Field(dfKategorien, 'art', "E");
         }
-    }, dataChanged: function ()
-    {
+    }, dataChanged: function () {
         isc.Timer.setTimeout("AusgabenListeDetails.getSum()", 500);
 
     }, hilites: hiliteArray
@@ -863,8 +838,8 @@ isc.HLayout.create({
     align: "center",
     layoutMargin: 0,
     margin: 0,
-    members: [AusgabenListe, AusgabenListeDetails]});
-
+    members: [AusgabenListe, AusgabenListeDetails]
+});
 
 
 isc.DynamicForm.create({
@@ -876,33 +851,33 @@ isc.DynamicForm.create({
     titleOrientation: "left",
     margin: 0,
     fields: [{
-            name: "kontonr",
-            title: "Konto",
-            width: 150,
-            optionDataSource: kontenDS,
-            valueField: "kontonr",
-            displayField: "bezeichnung",
+        name: "kontonr",
+        title: "Konto",
+        width: 150,
+        optionDataSource: kontenDS,
+        valueField: "kontonr",
+        displayField: "bezeichnung",
 //            defaultValue: "Konto wählen",
-            pickListProperties: {showShadow: false, showFilterEditor: false, showHeader: false},
-            pickListWidth: 350,
-            pickListFields: [
-                {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    count: ++dfKonten.monCnt};
-                return filter;
-            },
-            type: "select",
-            changed: function (form, item, value)
-            {
-                form.monCnt++;
-                AusgabenListe.fetchData({count: ++form.monCnt, giroSpar: value});
-                isc.Timer.setTimeout("AusgabenListe.selectRecord(0)", 200);
+        pickListProperties: {showShadow: false, showFilterEditor: false, showHeader: false},
+        pickListWidth: 350,
+        pickListFields: [
+            {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                count: ++dfKonten.monCnt
+            };
+            return filter;
+        },
+        type: "select",
+        changed: function (form, item, value) {
+            form.monCnt++;
+            AusgabenListe.fetchData({count: ++form.monCnt, giroSpar: value});
+            isc.Timer.setTimeout("AusgabenListe.selectRecord(0)", 200);
 //                              AusgabenListeDetails.fetchData({monat: record.monat, giroSpar: dfKonten.getField("giroSpar").getValue(), count: taksitListe.count});
 
-            }
-        }]});
+        }
+    }]
+});
 
 
 /*
@@ -920,85 +895,80 @@ isc.DynamicForm.create({
     titleOrientation: "left",
     margin: 10,
     fields: [{
-            name: "ID",
-            title: "ID",
-            type: "hidden"
-        }, {
-            name: "kontonr",
-            title: "Konto",
-            width: 150,
-            optionDataSource: kontenDS,
-            valueField: "kontonr",
-            displayField: "bezeichnung",
-            required: true,
+        name: "ID",
+        title: "ID",
+        type: "hidden"
+    }, {
+        name: "kontonr",
+        title: "Konto",
+        width: 150,
+        optionDataSource: kontenDS,
+        valueField: "kontonr",
+        displayField: "bezeichnung",
+        required: true,
 //            defaultValue: "Konto wählen",
-            pickListProperties: {showShadow: false, showFilterEditor: false, showHeader: false},
-            pickListWidth: 350,
-            pickListFields: [
-                {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    count: ++dfKonten.monCnt};
-                return filter;
-            },
-            type: "select",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
-            }
-        }, {
-            name: "datum",
-            title: "Datum",
-            type: "date",
-            startDate: "01/01/2010",
-            endDate: "31/12/2099",
-            required: true,
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
-            }
-        }, {
-            name: "buchtext",
-            title: "Buchungstext",
-            width: 300,
-            type: "text",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
-            }
-        }, {
-            name: "vorgang",
-            title: "Vorgang",
-            width: 300,
-            required: true,
-            type: "text",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
-            }
-        }, {
-            name: "herkunft",
-            title: "Herkunft",
-            width: 300,
-            type: "text",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
-            }
-        }, {
-            name: "betrag",
-            title: "Betrag",
-            width: 150,
-            type: "text",
-            required: true,
-            keyPressFilter: "[-0-9,.]",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
-            }
+        pickListProperties: {showShadow: false, showFilterEditor: false, showHeader: false},
+        pickListWidth: 350,
+        pickListFields: [
+            {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                count: ++dfKonten.monCnt
+            };
+            return filter;
+        },
+        type: "select",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
         }
-    ]});
+    }, {
+        name: "datum",
+        title: "Datum",
+        type: "date",
+        startDate: "01/01/2010",
+        endDate: "31/12/2099",
+        required: true,
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
+        }
+    }, {
+        name: "buchtext",
+        title: "Buchungstext",
+        width: 300,
+        type: "text",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
+        }
+    }, {
+        name: "vorgang",
+        title: "Vorgang",
+        width: 300,
+        required: true,
+        type: "text",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
+        }
+    }, {
+        name: "herkunft",
+        title: "Herkunft",
+        width: 300,
+        type: "text",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
+        }
+    }, {
+        name: "betrag",
+        title: "Betrag",
+        width: 150,
+        type: "text",
+        required: true,
+        keyPressFilter: "[-0-9,.]",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeEdit, btnResetUmsaetzeEdit, btnCloseUmsaetzeEdit);
+        }
+    }
+    ]
+});
 
 isc.IButton.create({
     ID: "btnCloseUmsaetzeEdit",
@@ -1008,22 +978,18 @@ isc.IButton.create({
     name: "btnCloseUmsaetzeEdit",
     showDisabledIcon: false,
     title: "Schließen", width: 100, //Neuen Film anlegen
-    click: function ()
-    {
-        if (btnCloseUmsaetzeEdit.getTitle() == "Abbrechen")
-        {
-            isc.ask("Wollen Sie wirklich abbrechen? Nicht gespeicherte Daten könnten verloren gehen.", function (value)
-            {
-                if (value)
-                {
+    click: function () {
+        if (btnCloseUmsaetzeEdit.getTitle() == "Abbrechen") {
+            isc.ask("Wollen Sie wirklich abbrechen? Nicht gespeicherte Daten könnten verloren gehen.", function (value) {
+                if (value) {
                     wdUmsaetzeEdit.hide();
                 }
             }, {title: "Vorgang abbrechen?"});
-        } else
-        {
+        } else {
             wdUmsaetzeEdit.hide();
         }
-    }});
+    }
+});
 /*
  * ************************* Speicher-Prozedur Edit Umsatz **********************
  */
@@ -1037,41 +1003,30 @@ isc.IButton.create({
     name: "btnSpeichernUmsaetzeEdit",
     title: "Speichern",
     width: 100, //Neuen Film anlegen
-    click: function ()
-    {
-        if (AusgabenListeDetails.getSelection().length == 1)
-        {
-            if (dfUmsaetzeEdit.validate())
-            {
+    click: function () {
+        if (AusgabenListeDetails.getSelection().length == 1) {
+            if (dfUmsaetzeEdit.validate()) {
                 id_ald = dfUmsaetzeEdit.getField("ID").getValue();
                 id_al = AusgabenListe.getSelectedRecord().ID;
-                RPCManager.send("", function (rpcResponse, data, rpcRequest)
-                {
+                RPCManager.send("", function (rpcResponse, data, rpcRequest) {
                     var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
-                    if (_data.response.status === 0)
-                    {  // Status 0 bedeutet Keine Fehler
+                    if (_data.response.status === 0) {  // Status 0 bedeutet Keine Fehler
 
 //                        AusgabenListeDetails.invalidateCache();
                         AusgabenListe.invalidateCache();
                         findRecord(AusgabenListe, id_al);
-                        isc.Timer.setTimeout(function ()
-                        {
+                        isc.Timer.setTimeout(function () {
                             findRecord(AusgabenListeDetails, id_ald);
                         }, 500);
-                        if (!dfUmsaetzeEdit.validate() && dfUmsaetzeEdit.hasErrors())
-                        {
+                        if (!dfUmsaetzeEdit.validate() && dfUmsaetzeEdit.hasErrors()) {
                             dfUmsaetzeEdit.setErrors();
                             var _errors = dfUmsaetzeEdit.getErrors();
-                            for (var i in _errors)
-                            {
+                            for (var i in _errors) {
                                 isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>"); // Hier wird jeder Wert des Array-Schlüssel angezeigt und das Feld oder die Feld-Bezeichnung ist irrelevant.
                             }
-                        } else
-                        {
-                            isc.say("Datensatz wurde erfolgreich editiert.", function (value)
-                            {
-                                if (value)
-                                {
+                        } else {
+                            isc.say("Datensatz wurde erfolgreich editiert.", function (value) {
+                                if (value) {
                                     isc.Timer.setTimeout("btnSpeichernUmsaetzeEdit.isLoadingUmsatzTimer()", 150);
                                     btnCloseUmsaetzeEdit.setTitle("Schließen");
                                     btnCloseUmsaetzeEdit.setIcon("famfam/door_in.png");
@@ -1082,13 +1037,11 @@ isc.IButton.create({
 
                             }, {title: "Datensatz bearbeitet"});
                         }
-                    } else
-                    { // Wenn die Validierungen Fehler aufweisen dann:
+                    } else { // Wenn die Validierungen Fehler aufweisen dann:
 
                         dfUmsaetzeEdit.setErrors(_data.response.errors, true);
                         var _errors = dfUmsaetzeEdit.getErrors();
-                        for (var i in _errors)
-                        {
+                        for (var i in _errors) {
                             isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>");
                         }
 
@@ -1105,22 +1058,19 @@ isc.IButton.create({
                         herkunft: dfUmsaetzeEdit.getField("herkunft").getValue(),
                         buchtext: dfUmsaetzeEdit.getField("buchtext").getValue(),
                         datum: dfUmsaetzeEdit.getField("datum").getValue(),
-                        kontonr: dfUmsaetzeEdit.getField("kontonr").getValue()}
+                        kontonr: dfUmsaetzeEdit.getField("kontonr").getValue()
+                    }
 
                 }); //Ende RPC
-            } else
-            {
+            } else {
                 isc.say("Bitte erst alle benötigten Felder ausfüllen");
             }
-        } else
-        {
+        } else {
             isc.say("Bitte erst einen Datensatz wählen");
         }
     }, // Ende Click
-    isLoadingUmsatzTimer: function ()
-    {
-        if (!Array.isLoading(AusgabenListeDetails.getRecord(0)))
-        {
+    isLoadingUmsatzTimer: function () {
+        if (!Array.isLoading(AusgabenListeDetails.getRecord(0))) {
 
         }
     }
@@ -1133,24 +1083,25 @@ isc.IButton.create({
     disabled: true,
     name: "btnResetUmsaetzeEdit",
     title: "Reset", width: 100, //Neuen Film anlegen
-    click: function ()
-    {
+    click: function () {
         dfUmsaetzeEdit.reset();
         btnSpeichernUmsaetzeEdit.setDisabled(true);
         btnResetUmsaetzeEdit.setDisabled(true);
         btnCloseUmsaetzeEdit.setTitle("Schließen");
         btnCloseUmsaetzeEdit.setIcon("famfam/door_in.png");
-    }});
+    }
+});
 isc.HLayout.create({
     ID: "HLayoutKundeEdit",
     height: 30,
     width: "100%",
     align: "center",
     members: [btnCloseUmsaetzeEdit, isc.LayoutSpacer.create({
-            width: 20
-        }), btnSpeichernUmsaetzeEdit, isc.LayoutSpacer.create({
-            width: 20
-        }), btnResetUmsaetzeEdit]});
+        width: 20
+    }), btnSpeichernUmsaetzeEdit, isc.LayoutSpacer.create({
+        width: 20
+    }), btnResetUmsaetzeEdit]
+});
 
 currentIcon = "famfam/sum.png";
 isc.Window.create({
@@ -1171,21 +1122,19 @@ isc.Window.create({
     modalMaskOpacity: 10,
     isModal: false,
     items: [dfUmsaetzeEdit, isc.LayoutSpacer.create({
-            height: 20
-        }), HLayoutKundeEdit]});
+        height: 20
+    }), HLayoutKundeEdit]
+});
 
 isc.ToolStripButton.create({
     ID: "tsbUmsaetzeEdit",
     count: 1,
-    action: function ()
-    {
-        if (AusgabenListeDetails.getSelection().length == 1)
-        {
+    action: function () {
+        if (AusgabenListeDetails.getSelection().length == 1) {
             var record = AusgabenListeDetails.getSelectedRecord();
             wdUmsaetzeEdit.show();
             dfUmsaetzeEdit.editRecord(record);
-        } else
-        {
+        } else {
             isc.say("Bitte erst einen Datensatz wählen");
         }
     },
@@ -1215,81 +1164,76 @@ isc.DynamicForm.create({
     titleOrientation: "left",
     margin: 10,
     fields: [{
-            name: "kontonr",
-            title: "Konto",
-            width: 150,
-            optionDataSource: kontenDS,
-            valueField: "kontonr",
-            displayField: "bezeichnung",
-            required: true,
+        name: "kontonr",
+        title: "Konto",
+        width: 150,
+        optionDataSource: kontenDS,
+        valueField: "kontonr",
+        displayField: "bezeichnung",
+        required: true,
 //            defaultValue: "Konto wählen",
-            pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
-            pickListWidth: 350,
-            pickListFields: [
-                {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    count: ++dfKonten.monCnt};
-                return filter;
-            },
-            type: "select",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-            }
-        }, {
-            name: "datum",
-            title: "Datum",
-            type: "date",
-            startDate: "01/01/2010",
-            endDate: "31/12/2099",
-            required: true,
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-            }
-        }, {
-            name: "buchtext",
-            title: "Buchungstext",
-            width: 300,
-            type: "text",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-            }
-        }, {
-            name: "vorgang",
-            title: "Vorgang",
-            width: 300,
-            required: true,
-            type: "text",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-            }
-        }, {
-            name: "herkunft",
-            title: "Herkunft",
-            width: 300,
-            type: "text",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-            }
-        }, {
-            name: "betrag",
-            title: "Betrag",
-            width: 150,
-            type: "text",
-            required: true,
-            keyPressFilter: "[-0-9,.]",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-            }
+        pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
+        pickListWidth: 350,
+        pickListFields: [
+            {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                count: ++dfKonten.monCnt
+            };
+            return filter;
+        },
+        type: "select",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
         }
-    ]});
+    }, {
+        name: "datum",
+        title: "Datum",
+        type: "date",
+        startDate: "01/01/2010",
+        endDate: "31/12/2099",
+        required: true,
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
+        }
+    }, {
+        name: "buchtext",
+        title: "Buchungstext",
+        width: 300,
+        type: "text",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
+        }
+    }, {
+        name: "vorgang",
+        title: "Vorgang",
+        width: 300,
+        required: true,
+        type: "text",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
+        }
+    }, {
+        name: "herkunft",
+        title: "Herkunft",
+        width: 300,
+        type: "text",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
+        }
+    }, {
+        name: "betrag",
+        title: "Betrag",
+        width: 150,
+        type: "text",
+        required: true,
+        keyPressFilter: "[-0-9,.]",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
+        }
+    }
+    ]
+});
 
 isc.IButton.create({
     ID: "btnCloseUmsaetzeAdd",
@@ -1299,22 +1243,18 @@ isc.IButton.create({
     name: "btnCloseUmsaetzeAdd",
     showDisabledIcon: false,
     title: "Schließen", width: 100,
-    click: function ()
-    {
-        if (btnCloseUmsaetzeAdd.getTitle() == "Abbrechen")
-        {
-            isc.ask("Wollen Sie wirklich abbrechen? Nicht gespeicherte Daten könnten verloren gehen.", function (value)
-            {
-                if (value)
-                {
+    click: function () {
+        if (btnCloseUmsaetzeAdd.getTitle() == "Abbrechen") {
+            isc.ask("Wollen Sie wirklich abbrechen? Nicht gespeicherte Daten könnten verloren gehen.", function (value) {
+                if (value) {
                     wdUmsaetzeAdd.hide();
                 }
             }, {title: "Vorgang abbrechen?"});
-        } else
-        {
+        } else {
             wdUmsaetzeAdd.hide();
         }
-    }});
+    }
+});
 /*
  * ************************* Speicher-Prozedur Add Umsatz **********************
  */
@@ -1328,46 +1268,34 @@ isc.IButton.create({
     name: "btnSpeichernUmsaetzeAdd",
     title: "Speichern",
     width: 100,
-    click: function ()
-    {
-        if (dfUmsaetzeAdd.validate())
-        {
-            if (AusgabenListe.getTotalRows() > 0)
-            {
+    click: function () {
+        if (dfUmsaetzeAdd.validate()) {
+            if (AusgabenListe.getTotalRows() > 0) {
                 id_al = AusgabenListe.getSelectedRecord().ID;
-            } else
-            {
+            } else {
                 id_al = 0;
             }
-            RPCManager.send("", function (rpcResponse, data, rpcRequest)
-            {
+            RPCManager.send("", function (rpcResponse, data, rpcRequest) {
                 var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
                 id_ald = _data.response.data["ID"];
-                if (_data.response.status === 0)
-                {  // Status 0 bedeutet Keine Fehler
+                if (_data.response.status === 0) {  // Status 0 bedeutet Keine Fehler
 
 
                     AusgabenListe.invalidateCache();
                     findRecord(AusgabenListe, id_al);
-                    isc.Timer.setTimeout(function ()
-                    {
+                    isc.Timer.setTimeout(function () {
                         findRecord(AusgabenListeDetails, id_ald);
                     }, 500);
 
-                    if (!dfUmsaetzeAdd.validate() && dfUmsaetzeAdd.hasErrors())
-                    {
+                    if (!dfUmsaetzeAdd.validate() && dfUmsaetzeAdd.hasErrors()) {
                         dfUmsaetzeAdd.setErrors();
                         var _errors = dfUmsaetzeAdd.getErrors();
-                        for (var i in _errors)
-                        {
+                        for (var i in _errors) {
                             isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>"); // Hier wird jeder Wert des Array-Schlüssel angezeigt und das Feld oder die Feld-Bezeichnung ist irrelevant.
                         }
-                    } else
-                    {
-                        isc.say("Datensatz wurde erfolgreich eingefügt.", function (value)
-                        {
-                            if (value)
-                            {
+                    } else {
+                        isc.say("Datensatz wurde erfolgreich eingefügt.", function (value) {
+                            if (value) {
                                 isc.Timer.setTimeout("btnSpeichernUmsaetzeAdd.isLoadingUmsatzTimer()", 150);
                                 resetButtons(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
                                 wdUmsaetzeAdd.hide();
@@ -1379,13 +1307,11 @@ isc.IButton.create({
                     //                                isc.say(id_ald);
 
 
-                } else
-                { // Wenn die Validierungen Fehler aufweisen dann:
+                } else { // Wenn die Validierungen Fehler aufweisen dann:
 
                     dfUmsaetzeAdd.setErrors(_data.response.errors, true);
                     var _errors = dfUmsaetzeAdd.getErrors();
-                    for (var i in _errors)
-                    {
+                    for (var i in _errors) {
                         isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>");
                     }
 
@@ -1401,19 +1327,17 @@ isc.IButton.create({
                     herkunft: dfUmsaetzeAdd.getField("herkunft").getValue(),
                     buchtext: dfUmsaetzeAdd.getField("buchtext").getValue(),
                     datum: dfUmsaetzeAdd.getField("datum").getValue(),
-                    kontonr: dfUmsaetzeAdd.getField("kontonr").getValue()}
+                    kontonr: dfUmsaetzeAdd.getField("kontonr").getValue()
+                }
 
             }); //Ende RPC
-        } else
-        {
+        } else {
             isc.say("Bitte erst alle benötigten Felder ausfüllen");
         }
 
     }, // Ende Click
-    isLoadingUmsatzTimer: function ()
-    {
-        if (!Array.isLoading(AusgabenListeDetails.getRecord(0)))
-        {
+    isLoadingUmsatzTimer: function () {
+        if (!Array.isLoading(AusgabenListeDetails.getRecord(0))) {
 //            isc.Timer.setTimeout("btnSpeichernUmsaetzeAdd.findNewUmsatz()", 150);
         }
     }
@@ -1426,21 +1350,22 @@ isc.IButton.create({
     disabled: true,
     name: "btnResetUmsaetzeAdd",
     title: "Reset", width: 100,
-    click: function ()
-    {
+    click: function () {
         dfUmsaetzeAdd.reset();
         resetButtons(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-    }});
+    }
+});
 isc.HLayout.create({
     ID: "HLayoutUmsatzAdd",
     height: 30,
     width: "100%",
     align: "center",
     members: [btnCloseUmsaetzeAdd, isc.LayoutSpacer.create({
-            width: 20
-        }), btnSpeichernUmsaetzeAdd, isc.LayoutSpacer.create({
-            width: 20
-        }), btnResetUmsaetzeAdd]});
+        width: 20
+    }), btnSpeichernUmsaetzeAdd, isc.LayoutSpacer.create({
+        width: 20
+    }), btnResetUmsaetzeAdd]
+});
 
 currentIcon = "famfam/sum.png";
 isc.Window.create({
@@ -1461,14 +1386,14 @@ isc.Window.create({
     modalMaskOpacity: 10,
     isModal: false,
     items: [dfUmsaetzeAdd, isc.LayoutSpacer.create({
-            height: 20
-        }), HLayoutUmsatzAdd]});
+        height: 20
+    }), HLayoutUmsatzAdd]
+});
 
 isc.ToolStripButton.create({
     ID: "tsbUmsaetzeAdd",
     count: 1,
-    action: function ()
-    {
+    action: function () {
         wdUmsaetzeAdd.show();
         btnResetUmsaetzeAdd.click();
         dfUmsaetzeAdd.getField("kontonr").setValue(dfKonten.getField("kontonr").getValue());
@@ -1491,27 +1416,26 @@ isc.ToolStripButton.create({
 isc.ToolStripButton.create({
     ID: "tsbUmsaetzeDelete",
     count: 1,
-    action: function ()
-    {
+    action: function () {
         id_al = AusgabenListe.getSelectedRecord().ID;
-        if (AusgabenListeDetails.getSelection().length == 1)
-        {
-            isc.ask("Wollen Sie wirklich den ausgewählten Datensatz löschen?", function (value)
-            {
-                if (value)
-                {
-                    id_ald = AusgabenListeDetails.getSelectedRecord().ID;
-                    RPCManager.send("", function (rpcResponse, data, rpcRequest)
-                    {
+        if (AusgabenListeDetails.getSelection().length > 0) {
+            isc.ask("Wollen Sie wirklich den ausgewählten Datensatz löschen?", function (value) {
+                if (value) {
+                    IDs = AusgabenListeDetails.getSelectedRecords();
+                    IDString = "";
+                    for (let i = 0; i < IDs.length; i++) {
+                        IDString += IDs[i].ID + "|";
+                    }
+                    RPCManager.send("", function (rpcResponse, data, rpcRequest) {
                         var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
-                        if (_data.response.status === 0)
-                        {  // Status 0 bedeutet Keine Fehler
-
-                            isc.say("Datensatz wurde erfolgreich gelöscht.");
+                        if (_data.response.status === 0) {  // Status 0 bedeutet Keine Fehler
                             AusgabenListe.invalidateCache();
+                            isc.say("Datensatz wurde erfolgreich gelöscht.", function (value) {
+                                AusgabenListe.deselectAllRecords();
+                                AusgabenListe.selectRecord(id_al);
+                            });
 
-                        } else
-                        { // Wenn die Validierungen Fehler aufweisen dann:
+                        } else { // Wenn die Validierungen Fehler aufweisen dann:
                             var _errors = _data.response.errors;
                             isc.say("<b>Fehler! </br>" + _errors + "</b>");
                         }
@@ -1521,14 +1445,15 @@ isc.ToolStripButton.create({
                         contentType: "application/x-www-form-urlencoded",
                         useSimpleHttp: true,
                         params: {
-                            ID: id_ald}
+                            ID: IDString,
+                            action: "delete"
+                        }
 
                     }); //Ende RPC   
                 }
             });
 
-        } else
-        {
+        } else {
             isc.say("Bitte erst einen Datensatz wählen");
         }
     },
@@ -1561,125 +1486,118 @@ isc.DynamicForm.create({
     validateOnChange: false,
     margin: 5,
     fields: [{
-            name: "art",
-            title: "Kategorie-Art",
-            width: 300,
-            required: true,
-            type: "radioGroup",
-            redrawOnChange: true,
-            vertical: false,
-            valueMap: {"A": "Ausgabe", "E": "Einnahme"},
-            defaultValue: "A",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }
-        }, {
-            name: "typ",
-            title: "Kategorie-Typ",
-            width: 300,
-            required: true,
-            type: "radioGroup",
-            redrawOnChange: true,
-            vertical: false,
-            valueMap: {"V": "Variabel", "F": "Fix"},
-            defaultValue: "V",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-                if (value == "F")
-                {
-                    dfKategorien.getField("interval").show();
-                    dfKategorien.getField("detail").setDisabled(false);
+        name: "art",
+        title: "Kategorie-Art",
+        width: 300,
+        required: true,
+        type: "radioGroup",
+        redrawOnChange: true,
+        vertical: false,
+        valueMap: {"A": "Ausgabe", "E": "Einnahme"},
+        defaultValue: "A",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }
+    }, {
+        name: "typ",
+        title: "Kategorie-Typ",
+        width: 300,
+        required: true,
+        type: "radioGroup",
+        redrawOnChange: true,
+        vertical: false,
+        valueMap: {"V": "Variabel", "F": "Fix"},
+        defaultValue: "V",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+            if (value == "F") {
+                dfKategorien.getField("interval").show();
+                dfKategorien.getField("detail").setDisabled(false);
 //                    dfKategorien.getField("dauer").show();
-                }
-                if (value == "V")
-                {
-                    dfKategorien.getField("interval").hide();
-                    dfKategorien.getField("detail").setDisabled(true);
-                    dfKategorien.getField("detail").setValue("N");
+            }
+            if (value == "V") {
+                dfKategorien.getField("interval").hide();
+                dfKategorien.getField("detail").setDisabled(true);
+                dfKategorien.getField("detail").setValue("N");
 //                    dfKategorien.getField("dauer").hide();
-                }
+            }
 
-            }
-        }, {
-            type: "RowSpacer",
-            height: 10
-        }, {
-            name: "kontonr",
-            title: "Konto",
-            width: 150,
-            optionDataSource: kontenDS,
-            valueField: "kontonr",
-            displayField: "bezeichnung",
-            required: true,
+        }
+    }, {
+        type: "RowSpacer",
+        height: 10
+    }, {
+        name: "kontonr",
+        title: "Konto",
+        width: 150,
+        optionDataSource: kontenDS,
+        valueField: "kontonr",
+        displayField: "bezeichnung",
+        required: true,
 //            defaultValue: "Konto wählen",
-            pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
-            pickListWidth: 350,
-            pickListFields: [
-                {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    count: ++dfKonten.monCnt};
-                return filter;
-            },
-            type: "select",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
-            }
-        }, {
+        pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
+        pickListWidth: 350,
+        pickListFields: [
+            {name: "bezeichnung", width: 140}, {name: "kontonr", width: 200}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                count: ++dfKonten.monCnt
+            };
+            return filter;
+        },
+        type: "select",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernUmsaetzeAdd, btnResetUmsaetzeAdd, btnCloseUmsaetzeAdd);
+        }
+    }, {
+        name: "kategorien",
+        title: "Kategorien",
+        width: 200,
+        optionDataSource: kategorienDS,
+        valueField: "ID",
+        displayField: "bezeichnung",
+        required: true,
+//            defaultValue: "Konto wählen",
+        pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
+        pickListWidth: 210,
+        pickListFields: [
+            {name: "bezeichnung", width: "*"}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                typ: dfKategorien.getField("typ").getValue(),
+                art: dfKategorien.getField("art").getValue(),
+                count: ++dfKategorien.monCnt
+            };
+            return filter;
+        },
+        type: "select",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }, icons: [{
+            src: "web/16/add.png",
             name: "kategorien",
-            title: "Kategorien",
-            width: 200,
-            optionDataSource: kategorienDS,
-            valueField: "ID",
-            displayField: "bezeichnung",
-            required: true,
-//            defaultValue: "Konto wählen",
-            pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
-            pickListWidth: 210,
-            pickListFields: [
-                {name: "bezeichnung", width: "*"}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    typ: dfKategorien.getField("typ").getValue(), art: dfKategorien.getField("art").getValue(), count: ++dfKategorien.monCnt
-                };
-                return filter;
-            },
-            type: "select",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }, icons: [{
-                    src: "web/16/add.png",
-                    name: "kategorien",
-                    width: 16,
-                    height: 16,
-                    prompt: "Neue Kategorie hinzufügen",
-                    hoverWidth: 300,
-                    hoverDelay: 700,
-                    click: function ()
-                    {
-                        wdStammKategorienAdd.show();
-                        btnResetStammKategorienAdd.click();
-                    }
-                }]
-        }, {
-            name: "interval",
-            title: "Intervall",
-            width: 200,
-            required: true,
-            type: "select",
-            redrawOnChange: true,
-            vertical: false,
-            valueMap: {"M": "monatlich", "Y": "jährlich", /*"W": "wöchentlich", "T": "täglich",*/ "Q": "quartalsweise"},
-            defaultValue: "M",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+            width: 16,
+            height: 16,
+            prompt: "Neue Kategorie hinzufügen",
+            hoverWidth: 300,
+            hoverDelay: 700,
+            click: function () {
+                wdStammKategorienAdd.show();
+                btnResetStammKategorienAdd.click();
+            }
+        }]
+    }, {
+        name: "interval",
+        title: "Intervall",
+        width: 200,
+        required: true,
+        type: "select",
+        redrawOnChange: true,
+        vertical: false,
+        valueMap: {"M": "monatlich", "Y": "jährlich", /*"W": "wöchentlich", "T": "täglich",*/ "Q": "quartalsweise"},
+        defaultValue: "M",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
 //                if (value == "M")
 //                {
 //                    form.getField("dauer").title = "Dauer in Monaten";
@@ -1696,183 +1614,173 @@ isc.DynamicForm.create({
 //                {
 //                    form.getField("dauer").title = "Quartalsweise Dauer";
 //                }
-            }
-        }, {
-            name: "datum",
-            title: "Datum",
-            type: "date",
-            startDate: "01/01/2010",
-            endDate: "31/12/2099",
-            required: true,
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }
-        }, {
-            name: "enddatum",
-            title: "Enddatum",
-            type: "date",
-            startDate: "01/01/2010",
-            endDate: "31/12/2099",
-            required: true,
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }
-        }, {
-            name: "vorgang",
-            title: "Vorgang",
-            width: 300,
-            required: true,
-            type: "comboBox",
-            optionDataSource: herkunftVorgangUmsDS,
-            valueField: "bezeichnung",
-            displayField: "bezeichnung",
-            pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
-            pickListWidth: 300,
-            pickListFields: [
-                {name: "bezeichnung", width: "*"}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    count: ++dfKonten.monCnt, f: this.name, value: dfKategorien.getField(this.name).getValue()};
-                return filter;
-            },
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }, icons: [{
-                    src: "web/16/delete.png",
-                    name: "vorgang",
-                    width: 16,
-                    height: 16,
-                    prompt: "Feldinhalt löschen",
-                    hoverWidth: 300,
-                    hoverDelay: 700,
-                    click: function ()
-                    {
-                        dfKategorien.getField("vorgang").clearValue();
-                        changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-                    }
-                }]
-        }, {
-            name: "herkunft",
-            title: "Herkunft",
-            width: 300,
-            required: true,
-            type: "comboBox",
-            optionDataSource: herkunftVorgangUmsDS,
-            valueField: "bezeichnung",
-            displayField: "bezeichnung",
-            pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
-            pickListWidth: 300,
-            pickListFields: [
-                {name: "bezeichnung", width: "*"}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    count: ++dfKonten.monCnt, f: this.name, value: dfKategorien.getField(this.name).getValue(), konto: dfKategorien.getField("kontonr").getValue()};
-                return filter;
-            },
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-
-            }, icons: [{
-                    src: "web/16/delete.png",
-                    name: "herkunft",
-                    width: 16,
-                    height: 16,
-                    prompt: "Feldinhalt löschen",
-                    hoverWidth: 300,
-                    hoverDelay: 700,
-                    click: function ()
-                    {
-                        dfKategorien.getField("herkunft").clearValue();
-                        changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-                    }
-                }]
-        }, {
-            name: "zahlungsmittel_id",
-            title: "Zahlungsmittel",
-            width: 300,
-            required: false,
-            type: "comboBox",
-            optionDataSource: zahlmittelUmsaetzeDS,
-            valueField: "ID",
-            displayField: "bezeichnung",
-            pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
-            pickListWidth: 300,
-            pickListFields: [
-                {name: "bezeichnung", width: "*"}],
-            getPickListFilterCriteria: function ()
-            {
-                var filter = {
-                    count: ++dfKategorien.monCnt, value: dfKategorien.getField(this.name).getDisplayValue()};
-                return filter;
-            },
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }, icons: [{
-                    src: "web/16/delete.png",
-                    name: "zahlungsmittel_id",
-                    width: 16,
-                    height: 16,
-                    prompt: "Feldinhalt löschen",
-                    hoverWidth: 300,
-                    hoverDelay: 700,
-                    click: function ()
-                    {
-                        dfKategorien.getField("zahlungsmittel_id").clearValue();
-                        changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-                    }
-                }]
-        }, {
-            name: "betrag",
-            title: "Betrag",
-            width: 150,
-            type: "text",
-            required: true,
-            keyPressFilter: "[-0-9,.]",
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }
-        }, {
-            type: "RowSpacer",
-            height: 10
-        }, {
-            name: "kommentar",
-            title: "Kommentar",
-            width: 280,
-            height: 60,
-            type: "textArea",
-            required: false,
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-            }
-        }, {
-            name: "detail",
-            title: "Detail",
-            width: 150,
-            type: "radioGroup",
-            valueMap: {"N": "Nein", "J": "Ja"},
-            defaultValue: "N",
-            required: false,
-            changed: function (form, item, value)
-            {
-                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-                if (value == "J")
-                {
-                    dfKategorien.getField("dauer").show();
-                } else
-                {
-                    dfKategorien.getField("dauer").hide();
-                }
-            }
+        }
+    }, {
+        name: "datum",
+        title: "Datum",
+        type: "date",
+        startDate: "01/01/2010",
+        endDate: "31/12/2099",
+        required: true,
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }
+    }, {
+        name: "enddatum",
+        title: "Enddatum",
+        type: "date",
+        startDate: "01/01/2010",
+        endDate: "31/12/2099",
+        required: true,
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }
+    }, {
+        name: "vorgang",
+        title: "Vorgang",
+        width: 300,
+        required: true,
+        type: "comboBox",
+        optionDataSource: herkunftVorgangUmsDS,
+        valueField: "bezeichnung",
+        displayField: "bezeichnung",
+        pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
+        pickListWidth: 300,
+        pickListFields: [
+            {name: "bezeichnung", width: "*"}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                count: ++dfKonten.monCnt, f: this.name, value: dfKategorien.getField(this.name).getValue()
+            };
+            return filter;
         },
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }, icons: [{
+            src: "web/16/delete.png",
+            name: "vorgang",
+            width: 16,
+            height: 16,
+            prompt: "Feldinhalt löschen",
+            hoverWidth: 300,
+            hoverDelay: 700,
+            click: function () {
+                dfKategorien.getField("vorgang").clearValue();
+                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+            }
+        }]
+    }, {
+        name: "herkunft",
+        title: "Herkunft",
+        width: 300,
+        required: true,
+        type: "comboBox",
+        optionDataSource: herkunftVorgangUmsDS,
+        valueField: "bezeichnung",
+        displayField: "bezeichnung",
+        pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
+        pickListWidth: 300,
+        pickListFields: [
+            {name: "bezeichnung", width: "*"}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                count: ++dfKonten.monCnt,
+                f: this.name,
+                value: dfKategorien.getField(this.name).getValue(),
+                konto: dfKategorien.getField("kontonr").getValue()
+            };
+            return filter;
+        },
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+
+        }, icons: [{
+            src: "web/16/delete.png",
+            name: "herkunft",
+            width: 16,
+            height: 16,
+            prompt: "Feldinhalt löschen",
+            hoverWidth: 300,
+            hoverDelay: 700,
+            click: function () {
+                dfKategorien.getField("herkunft").clearValue();
+                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+            }
+        }]
+    }, {
+        name: "zahlungsmittel_id",
+        title: "Zahlungsmittel",
+        width: 300,
+        required: false,
+        type: "comboBox",
+        optionDataSource: zahlmittelUmsaetzeDS,
+        valueField: "ID",
+        displayField: "bezeichnung",
+        pickListProperties: {showShadow: false, showFilterAddor: false, showHeader: false},
+        pickListWidth: 300,
+        pickListFields: [
+            {name: "bezeichnung", width: "*"}],
+        getPickListFilterCriteria: function () {
+            var filter = {
+                count: ++dfKategorien.monCnt, value: dfKategorien.getField(this.name).getDisplayValue()
+            };
+            return filter;
+        },
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }, icons: [{
+            src: "web/16/delete.png",
+            name: "zahlungsmittel_id",
+            width: 16,
+            height: 16,
+            prompt: "Feldinhalt löschen",
+            hoverWidth: 300,
+            hoverDelay: 700,
+            click: function () {
+                dfKategorien.getField("zahlungsmittel_id").clearValue();
+                changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+            }
+        }]
+    }, {
+        name: "betrag",
+        title: "Betrag",
+        width: 150,
+        type: "text",
+        required: true,
+        keyPressFilter: "[-0-9,.]",
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }
+    }, {
+        type: "RowSpacer",
+        height: 10
+    }, {
+        name: "kommentar",
+        title: "Kommentar",
+        width: 280,
+        height: 60,
+        type: "textArea",
+        required: false,
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+        }
+    }, {
+        name: "detail",
+        title: "Detail",
+        width: 150,
+        type: "radioGroup",
+        valueMap: {"N": "Nein", "J": "Ja"},
+        defaultValue: "N",
+        required: false,
+        changed: function (form, item, value) {
+            changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+            if (value == "J") {
+                dfKategorien.getField("dauer").show();
+            } else {
+                dfKategorien.getField("dauer").hide();
+            }
+        }
+    },
         {
             name: "dauer",
             title: "Dauer in Monaten",
@@ -1881,8 +1789,7 @@ isc.DynamicForm.create({
             min: 1, max: 9999, step: 1, wrapTitle: false,
             writeStackedIcons: false,
             keyPressFilter: "[0-9,]",
-            changed: function (form, item, value)
-            {
+            changed: function (form, item, value) {
                 changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
             }
         }, {
@@ -1898,31 +1805,30 @@ isc.DynamicForm.create({
             pickListWidth: 300,
             pickListFields: [
                 {name: "bezeichnung", width: "*"}],
-            getPickListFilterCriteria: function ()
-            {
+            getPickListFilterCriteria: function () {
                 var filter = {
-                    count: ++dfKategorien.monCnt, value: dfKategorien.getField(this.name).getValue()};
+                    count: ++dfKategorien.monCnt, value: dfKategorien.getField(this.name).getValue()
+                };
                 return filter;
             },
-            changed: function (form, item, value)
-            {
+            changed: function (form, item, value) {
                 changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
             }, icons: [{
-                    src: "web/16/delete.png",
-                    name: "bundle",
-                    width: 16,
-                    height: 16,
-                    prompt: "Feldinhalt löschen",
-                    hoverWidth: 300,
-                    hoverDelay: 700,
-                    click: function ()
-                    {
-                        dfKategorien.getField("bundle").clearValue();
-                        changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
-                    }
-                }]
+                src: "web/16/delete.png",
+                name: "bundle",
+                width: 16,
+                height: 16,
+                prompt: "Feldinhalt löschen",
+                hoverWidth: 300,
+                hoverDelay: 700,
+                click: function () {
+                    dfKategorien.getField("bundle").clearValue();
+                    changeFunction(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
+                }
+            }]
         }
-    ]});
+    ]
+});
 
 isc.IButton.create({
     ID: "btnCloseKategorien",
@@ -1932,22 +1838,18 @@ isc.IButton.create({
     name: "btnCloseKategorien",
     showDisabledIcon: false,
     title: "Schließen", width: 100,
-    click: function ()
-    {
-        if (btnCloseKategorien.getTitle() == "Abbrechen")
-        {
-            isc.ask("Wollen Sie wirklich abbrechen? Nicht gespeicherte Daten könnten verloren gehen.", function (value)
-            {
-                if (value)
-                {
+    click: function () {
+        if (btnCloseKategorien.getTitle() == "Abbrechen") {
+            isc.ask("Wollen Sie wirklich abbrechen? Nicht gespeicherte Daten könnten verloren gehen.", function (value) {
+                if (value) {
                     wdKategorien.hide();
                 }
             }, {title: "Vorgang abbrechen?"});
-        } else
-        {
+        } else {
             wdKategorien.hide();
         }
-    }});
+    }
+});
 /*
  * ************************* Speicher-Prozedur Add Umsatz **********************
  */
@@ -1961,40 +1863,30 @@ isc.IButton.create({
     name: "btnSpeichernKategorien",
     title: "Speichern",
     width: 100,
-    click: function ()
-    {
+    click: function () {
         id_al = AusgabenListe.getSelectedRecord().ID;
         id_ald = AusgabenListeDetails.getSelectedRecord().ID;
-        if (dfKategorien.validate())
-        {
-            RPCManager.send("", function (rpcResponse, data, rpcRequest)
-            {
+        if (dfKategorien.validate()) {
+            RPCManager.send("", function (rpcResponse, data, rpcRequest) {
                 var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
 
-                if (_data.response.status === 0)
-                {  // Status 0 bedeutet Keine Fehler
+                if (_data.response.status === 0) {  // Status 0 bedeutet Keine Fehler
 //                    umsatzKat_id = _data.response.data["ID"];
-                    if (!dfKategorien.validate() && dfKategorien.hasErrors())
-                    {
+                    if (!dfKategorien.validate() && dfKategorien.hasErrors()) {
                         dfKategorien.setErrors();
                         var _errors = dfKategorien.getErrors();
-                        for (var i in _errors)
-                        {
+                        for (var i in _errors) {
                             isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>"); // Hier wird jeder Wert des Array-Schlüssel angezeigt und das Feld oder die Feld-Bezeichnung ist irrelevant.
                         }
-                    } else
-                    {
+                    } else {
                         AusgabenListe.invalidateCache();
                         findRecord(AusgabenListe, id_al);
-                        isc.Timer.setTimeout(function ()
-                        {
+                        isc.Timer.setTimeout(function () {
                             findRecord(AusgabenListeDetails, id_ald);
                         }, 500);
 
-                        isc.say("Datensatz wurde erfolgreich eingefügt.", function (value)
-                        {
-                            if (value)
-                            {
+                        isc.say("Datensatz wurde erfolgreich eingefügt.", function (value) {
+                            if (value) {
                                 resetButtons(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
                                 wdKategorien.hide();
 
@@ -2003,13 +1895,11 @@ isc.IButton.create({
                         }, {title: "Datensatz einfügen"});
                     }
 
-                } else
-                { // Wenn die Validierungen Fehler aufweisen dann:
+                } else { // Wenn die Validierungen Fehler aufweisen dann:
 
                     dfKategorien.setErrors(_data.response.errors, true);
                     var _errors = dfKategorien.getErrors();
-                    for (var i in _errors)
-                    {
+                    for (var i in _errors) {
                         isc.say("<b>Fehler! </br>" + (_errors [i]) + "</b>");
                     }
 
@@ -2039,8 +1929,7 @@ isc.IButton.create({
                 }
 
             }); //Ende RPC
-        } else
-        {
+        } else {
             isc.say("Bitte erst alle benötigten Felder ausfüllen");
         }
 
@@ -2055,8 +1944,7 @@ isc.IButton.create({
     disabled: true,
     name: "btnResetKategorien",
     title: "Reset", width: 100,
-    click: function ()
-    {
+    click: function () {
         dfKategorien.reset();
         resetButtons(btnSpeichernKategorien, btnResetKategorien, btnCloseKategorien);
         dfKategorien.getField("interval").hide();
@@ -2075,10 +1963,11 @@ isc.HLayout.create({
     width: "100%",
     align: "center",
     members: [btnCloseKategorien, isc.LayoutSpacer.create({
-            width: 20
-        }), btnSpeichernKategorien, isc.LayoutSpacer.create({
-            width: 20
-        }), btnResetKategorien]});
+        width: 20
+    }), btnSpeichernKategorien, isc.LayoutSpacer.create({
+        width: 20
+    }), btnResetKategorien]
+});
 
 
 currentIcon = "famfam/sum.png";
@@ -2100,17 +1989,16 @@ isc.Window.create({
     modalMaskOpacity: 10,
     isModal: false,
     items: [dfKategorien, isc.LayoutSpacer.create({
-            height: 20
-        }), HLayoutKategorien]});
+        height: 20
+    }), HLayoutKategorien]
+});
 
 
 isc.ToolStripButton.create({
     ID: "tsbKategorien",
     count: 1,
-    action: function ()
-    {
-        if (AusgabenListeDetails.getSelection().length == 1)
-        {
+    action: function () {
+        if (AusgabenListeDetails.getSelection().length == 1) {
             wdKategorien.show();
             btnResetKategorien.click();
             dfKategorien.getField("betrag").setValue(AusgabenListeDetails.getSelectedRecord().betrag);
@@ -2123,20 +2011,118 @@ isc.ToolStripButton.create({
             dfKategorien.getField("dauer").hide();
             setValue2Field(dfKategorien, "detail", "N");
 
-            if (AusgabenListeDetails.getSelectedRecord().betrag.substr(0, 1) == "-")
-            {
+            if (AusgabenListeDetails.getSelectedRecord().betrag.substr(0, 1) == "-") {
                 setValue2Field(dfKategorien, 'art', "A");
-            } else
-            {
+            } else {
                 setValue2Field(dfKategorien, 'art', "E");
             }
-        } else
-        {
+        } else {
             isc.say("Bitte erst einen Datensatz wählen");
         }
     },
     prompt: "Kategorie-Zuordnen",
     icon: "web/32/application_from_storage.png",
+    title: "",
+    showDisabledIcon: false,
+    iconHeight: 32,
+    iconWidth: 32,
+    hoverWidth: 100,
+    hoverDelay: 700
+});
+
+
+isc.ToolStripButton.create({
+    ID: "tsbAutoKat",
+    count: 1,
+    action: function () {
+        IDs = AusgabenListeDetails.getSelectedRecords();
+        id_ald = dfUmsaetzeEdit.getField("ID").getValue();
+        id_al = AusgabenListe.getSelectedRecord().ID;
+        isc.ask("Auto-Kategorisierung für diese Vorgänge starten?", function (value) {
+            if (value) {
+                IDString = "";
+                for (let i = 0; i < IDs.length; i++) {
+                    IDString += IDs[i].ID + "|";
+                }
+                RPCManager.send("", function (rpcResponse, data, rpcRequest) {
+                    var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
+                    if (_data.response.status === 0) {  // Status 0 bedeutet Keine Fehler
+                        AusgabenListe.invalidateCache();
+                        findRecord(AusgabenListe, id_al);
+                        isc.Timer.setTimeout(function () {
+                            findRecord(AusgabenListeDetails, id_ald);
+                        }, 500);
+
+                    } else { // Wenn die Validierungen Fehler aufweisen dann:
+                        var _errors = _data.response.errors;
+                        isc.say("<b>Fehler! </br>" + _errors + "</b>");
+                    }
+                }, {// Übergabe der Parameter
+                    actionURL: "api/auto_kategorie.php",
+                    httpMethod: "POST",
+                    contentType: "application/x-www-form-urlencoded",
+                    useSimpleHttp: true,
+                    params: {
+                        ID: IDString
+                    }
+
+                }); //Ende RPC
+            }
+        });
+    },
+    prompt: "Automatische Kategorie-Zuordnung",
+    icon: "web/32/application_view_icons.png",
+    title: "",
+    showDisabledIcon: false,
+    iconHeight: 32,
+    iconWidth: 32,
+    hoverWidth: 100,
+    hoverDelay: 700
+});
+
+
+isc.ToolStripButton.create({
+    ID: "tsbDelKat",
+    count: 1,
+    action: function () {
+        isc.ask("Kategorie der markierten Datensätze entfernen?", function (value) {
+            if (value) {
+                IDs = AusgabenListeDetails.getSelectedRecords();
+                id_ald = dfUmsaetzeEdit.getField("ID").getValue();
+                id_al = AusgabenListe.getSelectedRecord().ID;
+                IDString = "";
+                for (let i = 0; i < IDs.length; i++) {
+                    IDString += IDs[i].ID + "|";
+                }
+                RPCManager.send("", function (rpcResponse, data, rpcRequest) {
+                    var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
+                    if (_data.response.status === 0) {  // Status 0 bedeutet Keine Fehler
+                        AusgabenListe.invalidateCache();
+                        findRecord(AusgabenListe, id_al);
+                        isc.Timer.setTimeout(function () {
+                            findRecord(AusgabenListeDetails, id_ald);
+                        }, 500);
+
+                    } else { // Wenn die Validierungen Fehler aufweisen dann:
+                        var _errors = _data.response.errors;
+                        isc.say("<b>Fehler! </br>" + _errors + "</b>");
+                    }
+                }, {// Übergabe der Parameter
+                    actionURL: "api/umsatz_delete.php",
+                    httpMethod: "POST",
+                    contentType: "application/x-www-form-urlencoded",
+                    useSimpleHttp: true,
+                    params: {
+                        ID: IDString,
+                        action: "deleteKat"
+                    }
+
+                }); //Ende RPC
+            }
+        });
+    },
+    prompt: "Löschen der Kategorie",
+    icon: "web/32/award_star_delete.png",
     title: "",
     showDisabledIcon: false,
     iconHeight: 32,
@@ -2152,13 +2138,10 @@ isc.ToolStripButton.create({
 isc.ToolStripButton.create({
     ID: "tsbUmsaetze",
     count: 1,
-    action: function ()
-    {
-        if (htmlPaneDropZoneUmsaetze.isVisible())
-        {
+    action: function () {
+        if (htmlPaneDropZoneUmsaetze.isVisible()) {
             htmlPaneDropZoneUmsaetze.hide();
-        } else
-        {
+        } else {
             htmlPaneDropZoneUmsaetze.show();
         }
     },
@@ -2178,51 +2161,71 @@ isc.ToolStripButton.create({
  */
 
 
-
 isc.Menu.create({
     ID: "menuUmsaetze",
     autoDraw: false,
     showShadow: true,
     shadowDepth: 10,
     data: [
-        {title: tsbUmsaetze.prompt, icon: tsbUmsaetze.icon, click: function ()
-            {
+        {
+            title: tsbUmsaetze.prompt, icon: tsbUmsaetze.icon, click: function () {
                 tsbUmsaetze.action();
-            }},
+            }
+        },
         {isSeparator: true},
-        {title: tsbUmsaetzeEdit.prompt, icon: tsbUmsaetzeEdit.icon, click: function ()
-            {
+        {
+            title: tsbUmsaetzeEdit.prompt, icon: tsbUmsaetzeEdit.icon, click: function () {
                 tsbUmsaetzeEdit.action();
-            }},
-        {title: tsbUmsaetzeAdd.prompt, icon: tsbUmsaetzeAdd.icon, click: function ()
-            {
+            }
+        },
+        {
+            title: tsbUmsaetzeAdd.prompt, icon: tsbUmsaetzeAdd.icon, click: function () {
                 tsbUmsaetzeAdd.action();
-            }},
-        {title: tsbUmsaetzeDelete.prompt, icon: tsbUmsaetzeDelete.icon, click: function ()
-            {
+            }
+        },
+        {
+            title: tsbUmsaetzeDelete.prompt, icon: tsbUmsaetzeDelete.icon, click: function () {
                 tsbUmsaetzeDelete.action();
-            }},
+            }
+        },
         {isSeparator: true},
-        {title: tsbKategorien.prompt, icon: tsbKategorien.icon, click: function ()
-            {
+        {
+            title: tsbKategorien.prompt, icon: tsbKategorien.icon, click: function () {
                 tsbKategorien.action();
             }
         },
         {isSeparator: true},
-        {title: "Status", icon: "icons/16/folder_document.png", submenu: [
-                {title: "Fix", icon: "web/16/thumb_up.png", click: function ()
-                    {
+        {
+            title: tsbAutoKat.prompt, icon: tsbAutoKat.icon, click: function () {
+                tsbAutoKat.action();
+            }
+        },
+        {isSeparator: true},
+        {
+            title: tsbDelKat.prompt, icon: tsbDelKat.icon, click: function () {
+                tsbDelKat.action();
+            }
+        },
+        {isSeparator: true},
+        {
+            title: "Status", icon: "icons/16/folder_document.png", submenu: [
+                {
+                    title: "Fix", icon: "web/16/thumb_up.png", click: function () {
                         setUmsatzStatus(-99);
-                    }},
-                {title: "Wird noch geprüft", icon: "web/16/question.png", click: function ()
-                    {
+                    }
+                },
+                {
+                    title: "Wird noch geprüft", icon: "web/16/question.png", click: function () {
                         setUmsatzStatus(-9999);
-                    }},
-                {title: "Wird nicht kategorisiert", icon: "web/16/exclamation.png", click: function ()
-                    {
+                    }
+                },
+                {
+                    title: "Wird nicht kategorisiert", icon: "web/16/exclamation.png", click: function () {
                         setUmsatzStatus(-999);
-                    }}
-            ]}
+                    }
+                }
+            ]
+        }
     ]
 });
 
@@ -2251,9 +2254,11 @@ isc.ToolStrip.create({
         tsbUmsaetzeEdit, isc.LayoutSpacer.create({width: 10}),
         tsbUmsaetzeAdd, isc.LayoutSpacer.create({width: 10}),
         tsbUmsaetzeDelete, isc.LayoutSpacer.create({width: 10}),
-        tsbKategorien, isc.LayoutSpacer.create({width: "*"}),
+        tsbKategorien, isc.LayoutSpacer.create({width: 10}),
+        tsbAutoKat, isc.LayoutSpacer.create({width: 10}),
+        tsbDelKat, isc.LayoutSpacer.create({width: "*"}),
         lblUmsaetze, isc.LayoutSpacer.create({width: 5})]
-});
+})
 
 isc.VLayout.create({
     ID: "VLayoutUmsaetze",
@@ -2270,30 +2275,28 @@ isc.VLayout.create({
 
 
 addNode("VLayoutUmsaetze", {
-    name: "VLayoutUmsaetze",
-    cat: "Finanzen",
-    onOpen: function ()
-    {
-        // Dropzone verstecken
-        htmlPaneDropZoneUmsaetze.hide();
-        clearCharts('');
-        // Konto-Selektor fixen
-        if (counterUmsatz == 0)
-        {            
-            setValue2Field(dfKonten, 'kontonr', "Konto wählen");
-            counterUmsatz++;
-            AusgabenListeDetails.contextMenu = menuUmsaetze;            
-        }
+        name: "VLayoutUmsaetze",
+        cat: "Finanzen",
+        onOpen: function () {
+            // Dropzone verstecken
+            htmlPaneDropZoneUmsaetze.hide();
+            clearCharts('');
+            // Konto-Selektor fixen
+            if (counterUmsatz == 0) {
+                setValue2Field(dfKonten, 'kontonr', "Konto wählen");
+                counterUmsatz++;
+                AusgabenListeDetails.contextMenu = menuUmsaetze;
+            }
 
-    },
-    treenode: {
-        Name: "VLayoutUmsaetze",
-        icon: "famfam/chart_bar.png",
-        title: "Umsätze",
-        enabled: true
-    },
-    reflow: true
-}
+        },
+        treenode: {
+            Name: "VLayoutUmsaetze",
+            icon: "famfam/chart_bar.png",
+            title: "Umsätze",
+            enabled: true
+        },
+        reflow: true
+    }
 );
 
 

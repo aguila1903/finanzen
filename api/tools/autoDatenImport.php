@@ -1,26 +1,7 @@
 <?php
 require_once('conf.php');
+require_once('functions.php.php');
 
-function deleteTmpFiles($outputfile, $extractFile)
-{
-    if (is_file($outputfile . '.txt')) {
-        unlink($outputfile . '.txt');
-    }
-    if (is_file($outputfile . '_raw.txt')) {
-        unlink($outputfile . '_raw.txt');
-    }
-    if (is_file($extractFile)) {
-        unlink($extractFile);
-    }
-}
-
-function cleanSpecChars($string)
-{
-    $special_chars = array("ä", "Ä", "ü", "Ü", "ö", "Ö", "ß", "Ğ", "ğ", "Ş", "ş", "Ç", "ç", "İ", "ı", " ");
-    $replace_chars = array("ae", "Ae", "ue", "Ue", "oe", "Oe", "ss", "G", "g", "S", "s", "C", "c", "I", "i", "_");
-    $return = str_replace($special_chars, $replace_chars, $string);
-    return $return;
-}
 
 function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath)
 {
@@ -79,7 +60,7 @@ function updateCreditCard($fullFileName, $dbSyb, $monat, $PDFtoolsPath)
         }
     }
 
-    file_put_contents("pos.txt", print_r($raw, true));
+//    file_put_contents("pos.txt", print_r($raw, true));
     $i = 0;
     for ($ii = 0; $ii < count($raw); $ii++) {
 

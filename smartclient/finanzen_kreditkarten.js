@@ -230,7 +230,7 @@ function uploadDocKreditKarten(_this, id)
                         lgKreditKarten.scrollToRow(index);
                     }
                 });
-
+                wdKreditKartenEdit.dfKreditKartenEditChanged();
                 if (metadaten.asgari != 0)
                 {
                     dfKreditKartenEdit.getField("mind_zahlung").setValue(metadaten.asgari);
@@ -247,6 +247,7 @@ function uploadDocKreditKarten(_this, id)
                 {
                     dfKreditKartenEdit.getField("zahlung").setValue(metadaten.oedeme);
                 }
+
             }
         } catch (err) {
             isc.say(err.message);

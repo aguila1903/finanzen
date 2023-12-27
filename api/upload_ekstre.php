@@ -3,38 +3,24 @@
 session_start();
 require_once('adodb5/adodb.inc.php');
 require_once('conf.php');
+require_once('functions.php');
 require_once('tools/autoDatenImport.php');
 
-
-$ADODB_CACHE_DIR = 'C:/php/cache';
-
-
-$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC; // Liefert ein assoziatives Array, das der geholten Zeile entspricht 
-
-$ADODB_COUNTRECS = true;
-
-$dbSyb = ADONewConnection("mysqli");
-
-// DB-Abfragen NICHT cachen
-$dbSyb->memCache = false;
-
-$dbSyb->Connect(DB_HOST, DB_USER, DB_PW, DB_NAME);  //=>>> Verbindungsaufbau mit der DB
+$db = connectAdoDB(DB_HOST, DB_USER, DB_PW, DB_NAME, 'mysqli');
 
 
 $out = array();
 $data = array();
 
-if (!$dbSyb->IsConnected()) {
+if (!$db->IsConnected()) {
 
     $out['response']['status'] = -1;
-    $out['response']['errors'] = "Error: " . $dbSyb->ErrorMsg();
+    $out['response']['errors'] = "Error: " . $db->ErrorMsg();
 
     print json_encode($out);
 
     return;
 }
-
-$dbSyb->debug = false;
 
 
 if (isset($_FILES['file'])) {
@@ -52,16 +38,16 @@ if (isset($_FILES['file'])) {
 
     if ($error_array > 0) {
         $fehlerText = "Error: unbekannt";
-        if ($fehler == 1) {
+        if ($error_array == 1) {
             $fehlerText = "Error: 1 (" . $size_array . ")";
         }
-        if ($fehler == 2) {
+        if ($error_array == 2) {
             $fehlerText = "Error: 2(" . $size_array . ")";
         }
-        if ($fehler == 3) {
+        if ($error_array == 3) {
             $fehlerText = "Error: die Datei wurde nur teilweise übertragen";
         }
-        if ($fehler == 4) {
+        if ($error_array == 4) {
             $fehlerText = "Error: es wurde keine Datei übertragen";
         }
         print json_encode($fehlerText);
@@ -122,11 +108,11 @@ $fileName = cleanSpecChars(basename(($_FILES['file']['name'])));
 if (move_uploaded_file(($tmp_name_array), $path . $fileName)) {
 
     $querySQL = "call kreditkarten_upload_doc (" . $ID
-            . "," . $dbSyb->Quote($fileName) . ");";
-    $rs = $dbSyb->Execute($querySQL);
+            . "," . $db->Quote($fileName) . ");";
+    $rs = $db->Execute($querySQL);
 
     if (!$rs) {
-        $result = json_encode('Error: Datenbank-Fehler beim Upload der Datei ' . $name_array . ' aufgetregen</br> SQL-Fehlermeldung: ' . $dbSyb->ErrorMsg());
+        $result = json_encode('Error: Datenbank-Fehler beim Upload der Datei ' . $name_array . ' aufgetregen</br> SQL-Fehlermeldung: ' . $db->ErrorMsg());
         print ($result);
         return;
     }
@@ -145,12 +131,12 @@ if (move_uploaded_file(($tmp_name_array), $path . $fileName)) {
     if ($ergebnis == 1 || $ergebnis == 0) {
 
 // Alle Raten hochsetzen bevor die Karten-Vorgänge aktualisiert werden.
-        $querySQL = "call raten_up (" . $dbSyb->Quote($monat) . ", " . $dbSyb->Quote($karten_nr) . ");";
+        $querySQL = "call raten_up (" . $db->Quote($monat) . ", " . $db->Quote($karten_nr) . ");";
 
-        $rs = $dbSyb->Execute($querySQL);
+        $rs = $db->Execute($querySQL);
 
         if (!$rs) {
-            $result = json_encode('Error: Fehler bei der Aktualisierung der Raten aufgetregen</br> SQL-Fehlermeldung: ' . $dbSyb->ErrorMsg());
+            $result = json_encode('Error: Fehler bei der Aktualisierung der Raten aufgetregen</br> SQL-Fehlermeldung: ' . $db->ErrorMsg());
             print ($result);
             return;
         }
@@ -168,7 +154,7 @@ if (move_uploaded_file(($tmp_name_array), $path . $fileName)) {
         if ($ergebnis == 1 || $ergebnis == 0) {
 
             $fullFileName = $path . $fileName;
-            $newRates = updateCreditCard($fullFileName, $dbSyb, $monat, PATH_PDFTools);
+            $newRates = updateCreditCard($fullFileName, $db, $monat, PATH_PDFTools);
 
             $result = json_encode($newRates);
             print ($result);

@@ -3,28 +3,30 @@
 session_start();
 require_once('adodb5/adodb.inc.php');
 require_once('conf.php');
+require_once('functions.php');
 
 
 $ADODB_CACHE_DIR = 'C:/php/cache';
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC; // Liefert ein assoziatives Array, das der geholten Zeile entspricht 
 $ADODB_COUNTRECS = true;
-$dbSyb = ADONewConnection('mysqli');
-$dbSyb->memCache = false;
+$db = ADONewConnection('mysqli');
+$db->memCache = false;
 
 
-$dbSyb->Connect(DB_HOST, DB_USER, DB_PW, DB_NAME);  //=>>> Verbindungsaufbau mit der DB
+$db->Connect(DB_HOST, DB_USER, DB_PW, DB_NAME);  //=>>> Verbindungsaufbau mit der DB
 
-if (!$dbSyb->IsConnected()) {
+if (!$db->IsConnected()) {
     $result = json_encode('Error: Datenbank-Verbindung konnte nicht hergestellt werden!');
     print ($result);
     return;
 }
 
 
-$dbSyb->debug = false;
+$db->debug = false;
 
 $ergebnis = 0;
-$data = array();
+$data = [];
+$value = [];
 
 if (isset($_FILES['file'])) {
 
@@ -58,7 +60,7 @@ if (isset($_FILES['file'])) {
     }
 } else {
     if (isset($_REQUEST['fileName'])) {
-        $fileName = $pdfPath . $_REQUEST['fileName'];
+        $fileName = $_REQUEST['fileName'];
     } else {
         $result = json_encode('Error: Es wurde keine Datei hochgeladen');
         print $result;
@@ -87,6 +89,11 @@ $result = json_encode("Datei beinhaltet keine Daten zum auswerten.");
 
 if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
 
+
+    // Hole Mapping-Kategorien
+    $querySQL = "Select * from category_mapping";
+    $catMaps = sqlQuery($querySQL, $db);
+
     $file = file_get_contents($path2 . $fileName, true);
 
     $file_repl = str_replace(array('\r', '"'), "", $file);
@@ -94,6 +101,7 @@ if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
     $split = explode("\n", $file_repl);
     $uplStatus = "";
     $ii = 1;
+    $umsatzID = 0;
     $tableStart = "<table>";
     $tableEnd = "</table>";
     $tableBody = "";
@@ -111,34 +119,63 @@ if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
                 $datum = $spalte[1];
                 $dat = explode(".", $datum);
 
-//                    if ($spalte[0] == 'DE37200505501313475590') { // Giro-Konto
-//                        $typ = 'G';
-//                    } else if ($spalte[0] == 'DE30200505503032245585') { // Spar-Konto
-//                        $typ = 'S';
-//                    } else if ($spalte[0] == 'DE46200505501032848705') { // Mäusekonto Berat
-//                        $typ = 'M1';
-//                    } else if ($spalte[0] == 'DE12200505501500680705') { // Mäusekonto Berke
-//                        $typ = 'M2';
-//                    }
+                #-[KATEGORIE ZUORDNUNG]-----------------------[START]
 
+                $results = [];
+                foreach ($catMaps as $catMap) {
+                    $pattern = '/' . $catMap['KEY'] . '/i';
+                    if (isset($spalte[11]) && preg_match($pattern, utf8_encode($spalte[4]) . " " . $spalte[11])) {
+                        $results['catID'] = $catMap['catID'];
+                        $results['KEY'] = $catMap['KEY'];
+                        $results['typ'] = $catMap['typ'];
+                        $results['match'] = utf8_encode($spalte[4]) . " " . $spalte[11];
+                        break;
+                    }
+                }
+
+                // Ordne alle nicht zuordbaren Paypal-Einkäufe PayPal zu
+
+                if (empty($results) && preg_match("/PayPal/i", utf8_encode($spalte[4]) . " " . $spalte[11])) {
+                    $results['catID'] = 103;
+                    $results['KEY'] = "PayPal";
+                    $results['typ'] = "V";
+                    $results['match'] = utf8_encode($spalte[4]) . " " . $spalte[11];
+                }
+
+                if (empty($results) && preg_match("/BARGELDAUSZAHLUNG/i", utf8_encode($spalte[3]))) {
+                    $results['catID'] = 45;
+                    $results['KEY'] = "BARGELDAUSZAHLUNG";
+                    $results['typ'] = "V";
+                    $results['match'] = utf8_encode($spalte[3]);
+                }
+
+                if (empty($results)) {
+//                    file_put_contents("noResults.txt", utf8_encode($spalte[4]) . " " . $spalte[11] . " $betrag\n", FILE_APPEND);
+                }
+
+//                file_put_contents("category.txt", print_r($results, true) . "\n", FILE_APPEND);
+
+                #-[KATEGORIE ZUORDNUNG]-----------------------[ENDE]
+
+                $einausgaben_id = '';
                 $querySQL = "call ausgabenADD ("
-                        . $dbSyb->Quote(utf8_encode($spalte[4])) //Verwendungszweck
-                        . ", " . str_replace(",", ".", $betrag) // Betrag
-                        . ", " . $dbSyb->Quote($dat[2] . "-" . $dat[1] . "-" . $dat[0]) //Buchungstag
-                        . ", " . $dbSyb->Quote($fileName)
-                        . ", " . $dbSyb->Quote(utf8_encode($spalte[3])) // Buchtext
-                        . ", " . $dbSyb->Quote($spalte[11]) // Beguenstigter/Zahlungspflichtiger
-                        . ", " . $dbSyb->Quote($hash)
-                        . ", " . $dbSyb->Quote($spalte[0]) // Kontonummer
-                        . ", '');";
+                    . $db->Quote(utf8_encode($spalte[4])) //Verwendungszweck
+                    . ", " . str_replace(",", ".", $betrag) // Betrag
+                    . ", " . $db->Quote($dat[2] . "-" . $dat[1] . "-" . $dat[0]) //Buchungstag
+                    . ", " . $db->Quote($fileName)
+                    . ", " . $db->Quote(utf8_encode($spalte[3])) // Buchtext
+                    . ", " . $db->Quote($spalte[11]) // Beguenstigter/Zahlungspflichtiger
+                    . ", " . $db->Quote($hash)
+                    . ", " . $db->Quote($spalte[0]) // Kontonummer
+                    . ", '$einausgaben_id');";
 
 //                    file_put_contents("upload_harcamaler.txt", $querySQL);
 
-                $rs = $dbSyb->Execute($querySQL);
+                $rs = $db->Execute($querySQL);
 
 
                 if (!$rs) {
-                    $result = json_encode('Error: Datenbank-Fehler beim Upload der Datei ' . $name_array . ' aufgetregen</br> SQL-Fehlermeldung: ' . $dbSyb->ErrorMsg());
+                    $result = json_encode('Error: Datenbank-Fehler beim Upload der Datei ' . $name_array . ' aufgetregen</br> SQL-Fehlermeldung: ' . $db->ErrorMsg());
                     print ($result);
                     return;
                 }
@@ -146,13 +183,78 @@ if (move_uploaded_file(($tmp_name_array), $path2 . $fileName)) {
                 $i = 0;
                 while (!$rs->EOF) {
                     $ergebnis = $rs->fields['Ergebnis'];
+                    $umsatzID = $rs->fields['ID'];
                     $tableBody .= ($ergebnis == "1") ? "<tr><td>$ii</td><td>" . $rs->fields['ErgText'] . "</td><td></td></tr>" : "<tr><td>$ii</td><td></td><td>" . $rs->fields['ErgText'] . "</td></tr>";
                     $i++;
 
                     $rs->MoveNext();
-                }               
+                }
 
                 $rs->Close();
+
+
+                #-[Ein-Ausgabe]-----------------------[START]
+                if (!empty($results) && $ergebnis == "1" && $umsatzID > 0) {
+                    $art = $betrag < 0 ? 'A' : 'E';
+                    $sqlQuery = "call umsaetzeKategorieAdd("
+                        . $db->quote($art) .
+                        ", " . $db->quote($results['typ']) .
+                        ", " . $db->quote($dat[2] . "-" . $dat[1] . "-" . $dat[0]) .
+                        ", " . $db->quote($spalte[0]) .
+                        ", " . $db->quote($spalte[4]) .
+                        ", " . $db->quote(utf8_encode($spalte[3])) .
+                        ", " . $betrag .
+                        ", " . $results['catID'] .
+                        ", " . 1;
+                    $interval_ = "'E'";
+                    $sqlQuery .= ", " . $interval_ .
+                        ", " . $db->quote($dat[2] . "-" . $dat[1] . "-" . $dat[0]) .
+                        ", ''" .
+                        ", 'N'" .
+                        ", ''" .
+                        ", $umsatzID" .
+                        ", ''";
+
+                    $sqlQuery .= ", NULL";
+
+                    $sqlQuery .= ");";
+
+                    $rs = $db->Execute($sqlQuery);
+
+                    $value = [];
+
+                    if (!$rs) {
+                        $out['response']['status'] = -4;
+                        $out['response']['errors'] = array('ID' => $db->ErrorMsg());
+
+                        print json_encode($out);
+                        return;
+                    }
+
+                    if (isset($rs->fields['ergebnis'])) {
+                        if ($rs->fields['ergebnis'] == 1) {
+                            $i = 0;
+
+                            while (!$rs->EOF) {
+                                $value["ID"] = (isset($rs->fields['ID'])) ? $rs->fields['ID'] : 0;
+                                $i++;
+
+                                $rs->MoveNext();
+                            }
+
+                            $rs->Close();
+
+                        }
+                    } else {
+                        $out['response']['status'] = -4;
+                        $out['response']['errors'] = array('ID' => "Keine Ergebnis-Rückmeldung erhalten </br>" . $db->ErrorMsg());
+
+                        print json_encode($out);
+                        return;
+                    }
+                }
+                #-[Ein-Ausgabe]-----------------------[ENDE]
+
             }
         }
 
