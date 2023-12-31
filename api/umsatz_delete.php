@@ -123,9 +123,22 @@ foreach ($aID as $id) {
             $sqlQuery = "Delete from einausgaben where ID = " . $rs2->fields['einausgaben_id'];
         }
 
-        $rs2->Close();
-    }
+        $rs = $dbSyb->Execute($sqlQuery);
 
+        if (!$rs) {
+            $out['response']['status'] = -4;
+            $out['response']['errors'] = "Error: " . $dbSyb->ErrorMsg();
+
+            print json_encode($out);
+            return;
+        }
+
+        $rs2->Close();
+
+        $rs->Close();
+
+        $sqlQuery = " Update monats_ausgaben set einausgaben_id = NULL WHERE ID = $id;";
+    }
 
     $rs = $dbSyb->Execute($sqlQuery);
 
@@ -137,6 +150,7 @@ foreach ($aID as $id) {
         return;
     }
     $rs->Close();
+
 
     // Nachträgliches Löschen der Kategorie
     if ($action == "delete") {

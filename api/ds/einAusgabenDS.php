@@ -29,15 +29,34 @@ if (!$dbSyb->IsConnected()) {
 
 $dbSyb->debug = false;
 
+
+function setFromClause($action, $from, $Where, $andDatumUnion, $andZeitraumUnion, $andJahrUnion)
+{
+    $operator = $action == "sum" ? "sum(e.betrag)" : "count(*)";
+    $return = " +  IFNULL(( 
+         SELECT  $operator
+        $from
+        JOIN dates_tmp dt ON e.ID=dt.einausgabe_id AND dt.einausgabe_id = e.ID  Where e.ID > -1 
+             $Where 
+             $andDatumUnion
+             $andZeitraumUnion
+             $andJahrUnion
+             ),0) ";
+   return $return;
+}
+
+
 if (isset($_REQUEST["konto"])) {
     $konto = $_REQUEST["konto"];
     if ($konto != "") {
         $aKonto = explode(",", $konto);
         $andKonto = " AND e.kontonr in ('" . implode("','", $aKonto) . "')";
-    } else {
+    }
+    else {
         $andKonto = "";
     }
-} else {
+}
+else {
     $andKonto = "";
 }
 
@@ -47,21 +66,24 @@ if (isset($_REQUEST["datum"])) {
     if ($datum == "null" || $datum == "") {
         $andDatum = "";
         $andDatumUnion = "";
-    } else {
+    }
+    else {
         if (preg_match("/,/", $datum)) {
             $aDatum = explode(",", $datum);
             foreach ($aDatum as $Datum) {
                 $datum_ = explode(".", $Datum);
                 $sDatum .= "'" . $datum_[2] . "-" . $datum_[1] . "-" . $datum_[0] . "',";
             }
-        } else {
+        }
+        else {
             $datum_ = explode(".", $datum);
             $sDatum .= "'" . $datum_[2] . "-" . $datum_[1] . "-" . $datum_[0] . "',";
         }
         $andDatum = " and (e.datum in (" . substr($sDatum, 0, -1) . "))";
         $andDatumUnion = " and (dt.datum in (" . substr($sDatum, 0, -1) . "))";
     }
-} else {
+}
+else {
     $andDatum = "";
     $andDatumUnion = "";
 }
@@ -71,7 +93,8 @@ if (isset($_REQUEST["enddatum"])) {
     $enddatum = $_REQUEST["enddatum"];
     if ($enddatum == "null" || $enddatum == "") {
         $andEndDatum = "";
-    } else {
+    }
+    else {
         $aEnddatum = explode(",", $enddatum);
         foreach ($aEnddatum as $Enddatum) {
             $enddatum_ = explode(".", $Enddatum);
@@ -79,7 +102,8 @@ if (isset($_REQUEST["enddatum"])) {
         }
         $andEndDatum = " and (e.enddatum in (" . substr($sEnddatum, 0, -1) . "))";
     }
-} else {
+}
+else {
     $andEndDatum = "";
 }
 
@@ -88,10 +112,12 @@ if (isset($_REQUEST["art"])) {
     $art = $_REQUEST["art"];
     if ($art == "null" || $art == "") {
         $andArt = "";
-    } else {
+    }
+    else {
         $andArt = " and (e.art = '$art') ";
     }
-} else {
+}
+else {
     $andArt = "";
 }
 
@@ -99,10 +125,12 @@ if (isset($_REQUEST["typ"])) {
     $typ = $_REQUEST["typ"];
     if ($typ == "null" || $typ == "") {
         $andTyp = "";
-    } else {
+    }
+    else {
         $andTyp = " and (e.typ = '$typ') ";
     }
-} else {
+}
+else {
     $andTyp = "";
 }
 
@@ -110,11 +138,13 @@ if (isset($_REQUEST["vorgang"])) {
     $vorgang = $_REQUEST["vorgang"];
     if ($vorgang == "null" || $vorgang == "") {
         $andVorgang = "";
-    } else {
+    }
+    else {
         $aVorgang = explode(",", $vorgang);
         $andVorgang = " AND e.vorgang in ('" . implode("','", $aVorgang) . "')";
     }
-} else {
+}
+else {
     $andVorgang = "";
 }
 
@@ -122,11 +152,13 @@ if (isset($_REQUEST["herkunft"])) {
     $herkunft = $_REQUEST["herkunft"];
     if ($herkunft == "null" || $herkunft == "") {
         $andHerkunft = "";
-    } else {
+    }
+    else {
         $aHerkunft = explode(",", $herkunft);
         $andHerkunft = " AND e.herkunft in ('" . implode("','", $aHerkunft) . "')";
     }
-} else {
+}
+else {
     $andHerkunft = "";
 }
 
@@ -134,11 +166,13 @@ if (isset($_REQUEST["interval"])) {
     $interval = $_REQUEST["interval"];
     if ($interval == "null" || $interval == "") {
         $andInterval = "";
-    } else {
+    }
+    else {
         $aInterval = explode(",", $interval);
         $andInterval = " AND e.interval in ('" . implode("','", $aInterval) . "')";
     }
-} else {
+}
+else {
     $andInterval = "";
 }
 
@@ -146,11 +180,13 @@ if (isset($_REQUEST["kategorie"])) {
     $kategorie = $_REQUEST["kategorie"];
     if ($kategorie == "null" || $kategorie == "" || preg_match("/<span/", $kategorie)) {
         $andKategorie = "";
-    } else {
+    }
+    else {
         $aKategorie = explode(",", $kategorie);
         $andKategorie = " AND ka.bezeichnung in ('" . implode("','", $aKategorie) . "')";
     }
-} else {
+}
+else {
     $andKategorie = "";
 }
 if (isset($_REQUEST["monat_jahr"])) {
@@ -158,14 +194,16 @@ if (isset($_REQUEST["monat_jahr"])) {
     if ($monat_jahr == "null" || $monat_jahr == "") {
         $andZeitraum = "";
         $andZeitraumUnion = "";
-    } else {
+    }
+    else {
         $aMonat_jahr = explode(",", $monat_jahr);
         $sMonat_jahr = "('" . implode("','", $aMonat_jahr) . "')";
         $andZeitraum = ' and (date_format(e.datum,"%m%Y")  in ' . $sMonat_jahr . ') ';
         $andZeitraumUnion = ' and (date_format(dt.datum,"%m%Y")  in ' . $sMonat_jahr . ') ';
     }
-} else {
-//    $andZeitraum = ' and (date_format(e.datum,"%m%Y")  = ' . $dbSyb->quote(date("mY")) . ') ';
+}
+else {
+    //    $andZeitraum = ' and (date_format(e.datum,"%m%Y")  = ' . $dbSyb->quote(date("mY")) . ') ';
     $andZeitraum = '';
     $andZeitraumUnion = "";
 }
@@ -174,11 +212,13 @@ if (isset($_REQUEST["zahlungsmittel"])) {
     $zahlungsmittel_id = $_REQUEST["zahlungsmittel"];
     if ($zahlungsmittel_id == "null" || $zahlungsmittel_id == "") {
         $andZahlungsmittel = "";
-    } else {
+    }
+    else {
         $aZahlungsmittel = explode(",", $zahlungsmittel_id);
         $andZahlungsmittel = " AND e.zahlungsmittel_id in (" . implode(",", $aZahlungsmittel) . ")";
     }
-} else {
+}
+else {
     $andZahlungsmittel = "";
 }
 
@@ -187,14 +227,16 @@ if (isset($_REQUEST["jahr"])) {
     if ($jahr == "null" || $jahr == "") {
         $andJahr = "";
         $andJahrUnion = "";
-    } else {
+    }
+    else {
         $aJahr = explode(",", $jahr);
         $sJahr = "('" . implode("','", $aJahr) . "')";
         $andJahr = ' and (date_format(e.datum,"%Y")  in ' . $sJahr . ') ';
         $andJahrUnion = ' and (date_format(dt.datum,"%Y")  in ' . $sJahr . ') ';
     }
-} else {
-//    $andZeitraum = ' and (date_format(e.datum,"%m%Y")  = ' . $dbSyb->quote(date("mY")) . ') ';
+}
+else {
+    //    $andZeitraum = ' and (date_format(e.datum,"%m%Y")  = ' . $dbSyb->quote(date("mY")) . ') ';
     $andJahr = '';
     $andJahrUnion = "";
 }
@@ -204,23 +246,27 @@ if (isset($_REQUEST["bundle"])) {
     $bundle = $_REQUEST["bundle"];
     if ($bundle == "null" || $bundle == "") {
         $andBundle = "";
-    } else {
+    }
+    else {
         $aBundle = explode(",", $bundle);
         $andBundle = " AND e.bundle in ('" . implode("','", $aBundle) . "')";
     }
-} else {
+}
+else {
     $andBundle = "";
 }
 
 if (isset($_REQUEST["f"])) {
     $f = $_REQUEST["f"];
-} else {
+}
+else {
     $f = "";
 }
 
 if (isset($_REQUEST["auswahl"])) {
     $ausw = $_REQUEST["auswahl"];
-} else {
+}
+else {
     $ausw = "B";
 }
 
@@ -234,23 +280,10 @@ $queryOrig = "SELECT e.ID, e.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang
  FROM einausgaben e 
   JOIN konten k ON e.kontonr=k.kontonr
   LEFT JOIN zahlungsmittel z ON z.ID = e.zahlungsmittel_id 
-  JOIN kategorien ka ON e.kategorie_id=ka.ID Where e.ID > -1 "
-        . $andKonto
-        . $andDatum
-        . $andEndDatum
-        . $andArt
-        . $andTyp
-        . $andVorgang
-        . $andHerkunft
-        . $andInterval
-        . $andZeitraum
-        . $andKategorie
-        . $andJahr
-        . $andBundle
-        . $andZahlungsmittel;
+  JOIN kategorien ka ON e.kategorie_id=ka.ID Where e.ID > -1 " . $andKonto . $andDatum . $andEndDatum . $andArt . $andTyp . $andVorgang . $andHerkunft . $andInterval . $andZeitraum . $andKategorie . $andJahr . $andBundle . $andZahlungsmittel;
 
 $queryUnion = " Union " // Fixkosten
-        . " SELECT e.ID, dt.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang, e.betrag, e.kategorie_id, e.interval,   
+    . " SELECT e.ID, dt.datum, enddatum, e.art, e.typ, e.kontonr, e.vorgang, e.betrag, e.kategorie_id, e.interval,   
   case when e.interval = 'Y' then 'jährlich' when e.interval = 'Q' then 'quartalsweise' when e.interval = 'M' then 'monatlich' when ifnull(e.interval,'') = '' or e.interval = 'E' then 'einmalig' END AS int_bez,
   case when e.typ = 'V' then 'Variabel' when e.typ = 'F' then 'Fix' ELSE '' END  typ_bez,
   case when e.art = 'A' then 'Ausgaben'  when e.art = 'E' then 'Einnahmen' ELSE '' END  art_bez,
@@ -260,39 +293,27 @@ $queryUnion = " Union " // Fixkosten
   JOIN kategorien ka on e.kategorie_id = ka.ID
   JOIN konten k ON e.kontonr = k.kontonr 
   LEFT JOIN zahlungsmittel z ON z.ID = e.zahlungsmittel_id 
-  JOIN dates_tmp dt ON e.ID=dt.einausgabe_id AND dt.einausgabe_id = e.ID  Where e.ID > -1 "
-        . $andKonto
-        . $andDatumUnion
-        . $andEndDatum
-        . $andArt
-        . $andTyp
-        . $andVorgang
-        . $andHerkunft
-        . $andInterval
-        . $andBundle
-        . $andZahlungsmittel
-        . $andZeitraumUnion
-        . $andJahrUnion
-        . $andKategorie;
+  JOIN dates_tmp dt ON e.ID=dt.einausgabe_id AND dt.einausgabe_id = e.ID  Where e.ID > -1 " . $andKonto . $andDatumUnion . $andEndDatum . $andArt . $andTyp . $andVorgang . $andHerkunft . $andInterval . $andBundle . $andZahlungsmittel . $andZeitraumUnion . $andJahrUnion . $andKategorie;
 
 if ($f != "sum") {
     if ($ausw == "B") {
         $querySQL = $queryOrig . $queryUnion;
-    } else {
+    }
+    else {
         $querySQL = $queryOrig;
     }
 
-//    file_put_contents("einAusgabeDS.txt", $querySQL);
+    //    file_put_contents("einAusgabeDS.txt", $querySQL);
 
     $rs = $dbSyb->Execute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?
-// Ausgabe initialisieren
+    // Ausgabe initialisieren
 
 
     if (!$rs) {
         print("Query 1: " . $dbSyb->ErrorMsg());
-        return($data);
+        return ($data);
     }
-// das else MUSS nicht sein, da ein Fehler vorher Stoppt
+    // das else MUSS nicht sein, da ein Fehler vorher Stoppt
 
 
     $i = 0;
@@ -326,7 +347,8 @@ if ($f != "sum") {
 
             $id = 0; // Einnahme
             $data[$i]["_hilite"] = $id;
-        } elseif ($rs->fields['betrag'] < 0) {
+        }
+        elseif ($rs->fields['betrag'] < 0) {
 
             $id = 1; // Ausgabe
             $data[$i]["_hilite"] = $id;
@@ -337,67 +359,71 @@ if ($f != "sum") {
     }
 
     $rs->Close();
-} else {
+}
+else {
     /*
      * ****************************** SUMMEN ***************************************
      * *****************************************************************************
      */
 
+$Where = " $andKonto             
+           $andEndDatum
+           $andArt
+           $andTyp
+           $andVorgang
+           $andHerkunft
+           $andInterval
+           $andBundle
+           $andZahlungsmittel
+           $andKategorie ";
+
+$from = " FROM einausgaben e 
+  JOIN konten k ON e.kontonr=k.kontonr
+  JOIN kategorien ka ON e.kategorie_id=ka.ID ";
+
+    $berechneteWerte = "";
+    $berechneteWerteCount = "";
+
+    // Fixkosten
+    if ($ausw == "B") {
+        $berechneteWerte = setFromClause("sum", $from, $Where, $andDatumUnion, $andZeitraumUnion, $andJahrUnion);
+        $berechneteWerteCount = setFromClause("count", $from, $Where, $andDatumUnion, $andZeitraumUnion, $andJahrUnion);
+    }
 
     $querySQL = "SELECT IFNULL(( Select sum(e.betrag)
- FROM einausgaben e 
-  JOIN konten k ON e.kontonr=k.kontonr
-  JOIN kategorien ka ON e.kategorie_id=ka.ID Where e.ID > -1 "
-            . $andKonto
-            . $andDatum
-            . $andEndDatum
-            . $andArt
-            . $andTyp
-            . $andVorgang
-            . $andHerkunft
-            . $andInterval
-            . $andZeitraum
-            . $andJahr
-            . $andKategorie
-            . $andBundle
-            . $andZahlungsmittel
-            . "),0) /* +  IFNULL((" // Fixkosten
-            . " SELECT  sum(e.betrag)
-  from einausgaben e 
-  JOIN kategorien ka on e.kategorie_id = ka.ID
-  JOIN konten k ON e.kontonr = k.kontonr 
-  JOIN dates_tmp dt ON e.ID=dt.einausgabe_id AND dt.einausgabe_id = e.ID  Where e.ID > -1 "
-            . $andKonto
-            . $andDatumUnion
-            . $andEndDatum
-            . $andArt
-            . $andTyp
-            . $andVorgang
-            . $andHerkunft
-            . $andInterval
-            . $andBundle
-            . $andZahlungsmittel
-            . $andZeitraumUnion
-            . $andJahrUnion
-            . $andKategorie
-            . "),0) */ as summe";
+                $from 
+        Where e.ID > -1 "
+        . $Where
+        . $andDatum
+        . $andZeitraum
+        . $andJahr
+        . "),0) $berechneteWerte as summe, 
+        IFNULL(( Select count(*)
+                $from 
+        Where e.ID > -1 "
+        . $Where
+        . $andDatum
+        . $andZeitraum
+        . $andJahr
+        . "),0) $berechneteWerteCount as anzahl";
 
-    file_put_contents("einAusgabenSummen.txt", $querySQL);
-    /* @var $rs string */
+//    file_put_contents("einAusgabenSummen.txt", $querySQL);
+
     $rs = $dbSyb->Execute($querySQL); //=>>> Abfrage wird an den Server �bermittelt / ausgef�hrt?
-// Ausgabe initialisieren
+    // Ausgabe initialisieren
 
 
     if (!$rs) {
         print("Query 1: " . $dbSyb->ErrorMsg());
-        return($data);
+        return ($data);
     }
-// das else MUSS nicht sein, da ein Fehler vorher Stoppt
+    // das else MUSS nicht sein, da ein Fehler vorher Stoppt
 
     $i = 0;
 
     while (!$rs->EOF) {
-        $data["summe"] = number_format($rs->fields['summe'], 2, ",", ".");
+        $data[$i]["summe"] = number_format($rs->fields['summe'], 2, ",", ".");
+        $data[$i]["anzahl"] =$rs->fields['anzahl'];
         $i++;
         $rs->MoveNext();
     }

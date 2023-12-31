@@ -138,11 +138,11 @@ function getSumEinAusgaben(_lbl_id, _scriptUrl, _jahr, _monat_jahr, _enddatum, _
     RPCManager.send("", function (rpcResponse, data, rpcRequest)
     {
         var _data = isc.JSON.decode(data); // Daten aus dem PHP (rpcResponse)
-        var summeUmsaetze = _data["summe"];
-//            var totalRows = _data["anzahl"];
+        var summeUmsaetze = _data[0]["summe"];
+        var totalRows = _data[0]["anzahl"];
 
 
-        var labelContent = '<table><tr style="width:100%; color:' + gridComponentsLabelColor + '; font-size:' + gridComponentsLabelFontSize + '; font-family:' + gridComponentsLabelFontFamily + '; text-decoration:none;"><td width="200">' + 0 + " Datensätze" + '</td><td width="80%"></td><td width="300" align="right">Summe: ' + summeUmsaetze + " €" + '</td></tr></table>';
+        var labelContent = '<table><tr style="width:100%; color:' + gridComponentsLabelColor + '; font-size:' + gridComponentsLabelFontSize + '; font-family:' + gridComponentsLabelFontFamily + '; text-decoration:none;"><td width="200">' + totalRows + " Datensätze" + '</td><td width="80%"></td><td width="300" align="right">Summe: ' + summeUmsaetze + " €" + '</td></tr></table>';
         _lbl_id.setContents(labelContent);
 //            }
     }, {// Übergabe der Parameter

@@ -726,6 +726,13 @@ isc.ListGrid.create({
     showGridSummary: true,
     fields: [
         {
+            name: "ID",
+            type: "text",
+            title: "ID",
+            width: 30,
+            showIf: "false"
+        },
+        {
             name: "ref",
             type: "image",
             imageURLPrefix: "web/16/",
